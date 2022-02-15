@@ -8,10 +8,11 @@ import (
 	"sirclo/project/capstone/entities"
 
 	response "sirclo/project/capstone/delivery/common"
-	// middlewares "sirclo/project/capstone/delivery/middleware"
+	middlewares "sirclo/project/capstone/delivery/middleware"
 	userRepo "sirclo/project/capstone/repository/user"
 
 	"github.com/labstack/echo/v4"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserController struct {
@@ -30,17 +31,17 @@ func (uc UserController) CreateUserController() echo.HandlerFunc {
 		if err := c.Bind(&userRequest); err != nil {
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to bind data"))
 		}
-		// password := []byte(userRequest.Password)
+		password := []byte(userRequest.Password)
 
-		// hashedPassword, errEncrypt := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
-		// if errEncrypt != nil {
-		// 	return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to encrpyt password"))
-		// }
+		hashedPassword, errEncrypt := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
+		if errEncrypt != nil {
+			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to encrpyt password"))
+		}
 
 		user := entities.User{
 			Name:         userRequest.Name,
 			Email:        userRequest.Email,
-			Password:     userRequest.Password,
+			Password:     string(hashedPassword),
 			Birth_date:   userRequest.Birth_date,
 			Phone_number: userRequest.Phone_number,
 			Photo:        userRequest.Photo,
@@ -91,11 +92,11 @@ func (uc UserController) GetByIdController() echo.HandlerFunc {
 // 4. update user
 func (uc UserController) UpdateUserController() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		// _, err := middlewares.GetUserName(c)
+		_, err := middlewares.GetEmail(c)
 
-		// if err != nil {
-		// 	return c.JSON(http.StatusUnauthorized, response.UnauthorizedRequest("unauthorized", "unauthorized access"))
-		// }
+		if err != nil {
+			return c.JSON(http.StatusUnauthorized, response.UnauthorizedRequest("unauthorized", "unauthorized access"))
+		}
 
 		// get id from param
 		userId, errConv := strconv.Atoi(c.Param("id"))
@@ -107,13 +108,13 @@ func (uc UserController) UpdateUserController() echo.HandlerFunc {
 		if errBind := c.Bind(&user); errBind != nil {
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to bind data"))
 		}
-		// password := []byte(user.Password)
+		password := []byte(user.Password)
 
-		// hashedPassword, errEncrypt := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
-		// if errEncrypt != nil {
-		// 	return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to encrpyt password"))
-		// }
-		// user.Password = string(hashedPassword)
+		hashedPassword, errEncrypt := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
+		if errEncrypt != nil {
+			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to encrpyt password"))
+		}
+		user.Password = string(hashedPassword)
 		// update user based on id to database
 		errUpdate := uc.repository.Update(user, userId)
 		if errUpdate != nil {
@@ -128,11 +129,11 @@ func (uc UserController) UpdateUserController() echo.HandlerFunc {
 // 5. delete user
 func (uc UserController) DeleteUserController() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		// _, err := middlewares.GetUserName(c)
+		_, err := middlewares.GetEmail(c)
 
-		// if err != nil {
-		// 	return c.JSON(http.StatusUnauthorized, response.UnauthorizedRequest("unauthorized", "unauthorized access"))
-		// }
+		if err != nil {
+			return c.JSON(http.StatusUnauthorized, response.UnauthorizedRequest("unauthorized", "unauthorized access"))
+		}
 
 		// get id from param
 		userId, errConv := strconv.Atoi(c.Param("id"))

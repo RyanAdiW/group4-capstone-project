@@ -5,8 +5,10 @@ import (
 	_route "sirclo/project/capstone/delivery/routers"
 	"sirclo/project/capstone/util"
 
+	_authController "sirclo/project/capstone/delivery/controllers/auth"
 	_userController "sirclo/project/capstone/delivery/controllers/user"
 
+	_authRepo "sirclo/project/capstone/repository/auth"
 	_userRepo "sirclo/project/capstone/repository/user"
 
 	"github.com/labstack/echo/v4"
@@ -21,11 +23,11 @@ func main() {
 	defer db.Close()
 
 	// initialize model
-	// authRepo := _authRepo.NewAuthRepository(db)
+	authRepo := _authRepo.NewAuthRepo(db)
 	userRepo := _userRepo.NewUserRepo(db)
 
 	// initialize controller
-	// authController := _authController.NewAuthController(authRepo)
+	authController := _authController.NewAuthController(authRepo)
 	userController := _userController.NewUserController(userRepo)
 
 	// create new echo
@@ -33,7 +35,7 @@ func main() {
 
 	e.Pre(middleware.RemoveTrailingSlash(), middleware.CORS())
 
-	_route.RegisterPath(e, userController)
+	_route.RegisterPath(e, authController, userController)
 
 	// start the server, and log if it fails
 	e.Logger.Fatal(e.Start(":8080"))
