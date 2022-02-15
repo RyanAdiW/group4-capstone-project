@@ -17,10 +17,12 @@ func MysqlDriver(config *config.AppConfig) *sql.DB {
 		config.Database.Port,
 		config.Database.Name,
 	)
+
 	db, err := sql.Open(config.Database.Driver, uri)
 	if err != nil {
 		log.Info("error to connect database: ", err)
 		panic(err)
 	}
+
 	return db
 }

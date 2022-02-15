@@ -3,9 +3,11 @@ package user
 import (
 	"fmt"
 	"net/http"
+	"path/filepath"
 	"strconv"
 
 	"sirclo/project/capstone/entities"
+	"sirclo/project/capstone/util"
 
 	response "sirclo/project/capstone/delivery/common"
 	middlewares "sirclo/project/capstone/delivery/middleware"
@@ -31,6 +33,33 @@ func (uc UserController) CreateUserController() echo.HandlerFunc {
 		if err := c.Bind(&userRequest); err != nil {
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to bind data"))
 		}
+
+		//bind data photo
+		// Multipart form
+		form, err := c.MultipartForm()
+		if err != nil {
+			return err
+		}
+		files := form.File["photo"]
+
+		var url_photo string
+		for _, file := range files {
+			// Source
+			src, err := file.Open()
+			if err != nil {
+				return err
+			}
+			defer src.Close()
+
+			fileExtension := filepath.Ext(file.Filename)
+			filename := "profile_pics/" + userRequest.Email + fileExtension
+			url_photo, err = util.UploadToS3(&src, filename)
+			if err != nil {
+				return err
+			}
+		}
+
+		//set password
 		password := []byte(userRequest.Password)
 
 		hashedPassword, errEncrypt := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
@@ -48,7 +77,7 @@ func (uc UserController) CreateUserController() echo.HandlerFunc {
 			Password:     string(hashedPassword),
 			Birth_date:   userRequest.Birth_date,
 			Phone_number: userRequest.Phone_number,
-			Photo:        userRequest.Photo,
+			Photo:        url_photo,
 			Gender:       userRequest.Gender,
 			Address:      userRequest.Address,
 		}
@@ -60,7 +89,7 @@ func (uc UserController) CreateUserController() echo.HandlerFunc {
 		}
 
 		// create user to database
-		err := uc.repository.Create(user)
+		err = uc.repository.Create(user)
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to create user"))
 		}
