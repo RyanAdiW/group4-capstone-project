@@ -103,6 +103,11 @@ func (uc UserController) UpdateUserController() echo.HandlerFunc {
 		if errConv != nil {
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to convert id"))
 		}
+		tokenId, _ := middlewares.GetId(c)
+		if userId != tokenId {
+			return c.JSON(http.StatusUnauthorized, response.UnauthorizedRequest("unauthorized", "unauthorized access"))
+		}
+
 		// binding data
 		user := entities.User{}
 		if errBind := c.Bind(&user); errBind != nil {
@@ -140,6 +145,12 @@ func (uc UserController) DeleteUserController() echo.HandlerFunc {
 		if errConv != nil {
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to convert id"))
 		}
+
+		tokenId, _ := middlewares.GetId(c)
+		if userId != tokenId {
+			return c.JSON(http.StatusUnauthorized, response.UnauthorizedRequest("unauthorized", "unauthorized access"))
+		}
+
 		// delete user based on id from database
 		errDelete := uc.repository.Delete(userId)
 		if errDelete != nil {

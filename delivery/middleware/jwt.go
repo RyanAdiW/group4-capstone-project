@@ -39,7 +39,7 @@ func GetEmail(e echo.Context) (string, error) {
 	return "", fmt.Errorf("invalid user")
 }
 
-func GetId(jwtSecret string, e echo.Context) (int, error) {
+func GetId(e echo.Context) (int, error) {
 	user := e.Get("user").(*jwt.Token)
 	if user.Valid {
 		claims := user.Claims.(jwt.MapClaims)
