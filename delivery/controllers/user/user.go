@@ -37,6 +37,10 @@ func (uc UserController) CreateUserController() echo.HandlerFunc {
 		if errEncrypt != nil {
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to encrpyt password"))
 		}
+		existingEmail, errEmail := uc.repository.GetEmail()
+		if errEmail != nil {
+			return fmt.Errorf("error from repo")
+		}
 
 		user := entities.User{
 			Name:         userRequest.Name,
@@ -47,6 +51,12 @@ func (uc UserController) CreateUserController() echo.HandlerFunc {
 			Photo:        userRequest.Photo,
 			Gender:       userRequest.Gender,
 			Address:      userRequest.Address,
+		}
+
+		for _, v := range existingEmail {
+			if v.Email == user.Email {
+				return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to join, email has been registered"))
+			}
 		}
 
 		// create user to database

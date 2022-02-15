@@ -63,7 +63,7 @@ func (ur *userRepo) Get() ([]entities.User, error) {
 func (ur *userRepo) GetById(id int) (entities.User, error) {
 	var user entities.User
 
-	row := ur.db.QueryRow(`SELECT id, name, email, birth_date, phone_number, photo, gender, address FROM users WHERE id = ? AND deleted_at IS NULL`, id)
+	row := ur.db.QueryRow("SELECT id, name, email, birth_date, phone_number, photo, gender, address FROM users WHERE id = ? AND deleted_at IS NULL", id)
 
 	err := row.Scan(&user.Id, &user.Name, &user.Email, &user.Birth_date, &user.Phone_number, &user.Photo, &user.Gender, &user.Address)
 	if err != nil {
@@ -91,4 +91,26 @@ func (ur *userRepo) Delete(id int) error {
 		return fmt.Errorf("id not found")
 	}
 	return err
+}
+
+// get email user
+func (ur *userRepo) GetEmail() ([]entities.User, error) {
+	var users []entities.User
+	res, err := ur.db.Query("select email from users where deleted_at is null")
+	if err != nil {
+		return nil, err
+	}
+	defer res.Close()
+
+	for res.Next() {
+		var user entities.User
+
+		err = res.Scan(&user.Email)
+		if err != nil {
+			return nil, err
+		}
+
+		users = append(users, user)
+	}
+	return users, nil
 }
