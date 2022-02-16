@@ -5,8 +5,8 @@ services:
     image: mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: admin
-      MYSQL_DATABASE: capstone-database
+      MYSQL_ROOT_PASSWORD: admin12345
+      MYSQL_DATABASE: project-capstone
     ports: 
       - 3306:3306
     volumes:
