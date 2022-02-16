@@ -162,6 +162,32 @@ func (uc UserController) UpdateUserController() echo.HandlerFunc {
 		if errEncrypt != nil {
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to encrpyt password"))
 		}
+
+		//bind data photo
+		// Multipart form
+		var url_photo string
+		form, err := c.MultipartForm()
+		if err == nil {
+			files := form.File["photo"]
+
+			for _, file := range files {
+				// Source
+				src, err := file.Open()
+				if err != nil {
+					log.Println(err)
+					return err
+				}
+				defer src.Close()
+
+				fileExtension := filepath.Ext(file.Filename)
+				filename := "profile_pics/" + user.Email + fileExtension
+				url_photo, err = util.UploadToS3(&src, filename)
+				if err != nil {
+					return err
+				}
+			}
+		}
+		user.Photo = url_photo
 		user.Password = string(hashedPassword)
 		// update user based on id to database
 		errUpdate := uc.repository.Update(user, userId)
