@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"io"
+	"log"
 	"mime/multipart"
 	"sirclo/project/capstone/config"
 
@@ -19,6 +20,7 @@ func UploadToS3(file *multipart.File, filename string) (string, error) {
 	// Destination
 	var buf bytes.Buffer
 	if _, err := io.Copy(&buf, *file); err != nil {
+		log.Println(err)
 		return "", err
 	}
 
@@ -40,6 +42,7 @@ func UploadToS3(file *multipart.File, filename string) (string, error) {
 
 	output, err := uploader.UploadWithContext(context.Background(), input)
 	if err != nil {
+		log.Println(err)
 		return "", err
 	}
 

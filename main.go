@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"sirclo/project/capstone/config"
 	_route "sirclo/project/capstone/delivery/routers"
 	"sirclo/project/capstone/util"
@@ -16,6 +17,9 @@ import (
 )
 
 func main() {
+	//log
+	log.SetFlags(log.Lshortfile | log.LstdFlags)
+
 	// load config
 	config := config.GetConfig()
 	// initialize database connection

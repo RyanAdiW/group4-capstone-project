@@ -3,6 +3,7 @@ package user
 import (
 	"database/sql"
 	"fmt"
+	"log"
 
 	"sirclo/project/capstone/entities"
 )
@@ -21,6 +22,7 @@ func (ur *userRepo) Create(user entities.User) error {
 
 	statement, err := ur.db.Prepare(query)
 	if err != nil {
+		log.Println(err)
 		return err
 	}
 
@@ -28,6 +30,7 @@ func (ur *userRepo) Create(user entities.User) error {
 
 	_, err = statement.Exec(user.Name, user.Email, user.Password, user.Birth_date, user.Phone_number, user.Photo, user.Gender, user.Address)
 	if err != nil {
+		log.Println(err)
 		return err
 	}
 

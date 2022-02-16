@@ -2,6 +2,7 @@ package user
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"path/filepath"
 	"strconv"
@@ -31,6 +32,7 @@ func (uc UserController) CreateUserController() echo.HandlerFunc {
 		// bind data
 		var userRequest UserRequestFormat
 		if err := c.Bind(&userRequest); err != nil {
+			log.Println(err)
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to bind data"))
 		}
 
@@ -38,6 +40,7 @@ func (uc UserController) CreateUserController() echo.HandlerFunc {
 		// Multipart form
 		form, err := c.MultipartForm()
 		if err != nil {
+			log.Println(err)
 			return err
 		}
 		files := form.File["photo"]
@@ -47,6 +50,7 @@ func (uc UserController) CreateUserController() echo.HandlerFunc {
 			// Source
 			src, err := file.Open()
 			if err != nil {
+				log.Println(err)
 				return err
 			}
 			defer src.Close()
@@ -68,6 +72,7 @@ func (uc UserController) CreateUserController() echo.HandlerFunc {
 		}
 		existingEmail, errEmail := uc.repository.GetEmail()
 		if errEmail != nil {
+			log.Println("error from repo")
 			return fmt.Errorf("error from repo")
 		}
 
@@ -91,6 +96,7 @@ func (uc UserController) CreateUserController() echo.HandlerFunc {
 		// create user to database
 		err = uc.repository.Create(user)
 		if err != nil {
+			log.Println(err)
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to create user"))
 		}
 
