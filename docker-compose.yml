@@ -1,10 +1,6 @@
 version: "3"
 services: 
-  
-  OperationEngine:
-    volumes:
-      - /secure/config/database.properties:/config/database.properties
-  
+
   appdb:
     image: mysql
     restart: always
