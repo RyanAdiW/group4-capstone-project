@@ -15,6 +15,3 @@ services:
       S3_BUCKET_NAME: ${S3_BUCKET_NAME}
     ports:
       - 8080:8080
-  
-volumes:
-  my-datavolume:
