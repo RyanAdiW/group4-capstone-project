@@ -1,29 +1,29 @@
 version: "3"
 services: 
 
-  appdb:
-    image: mysql
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: admin12345
-      MYSQL_DATABASE: project-capstone
-    ports: 
-      - 3306:3306
-    volumes:
-      # - './data:/bitnami/mysql/data'
-      - './init:/docker-entrypoint-initdb.d'
-      - my-datavolume:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysql", "-u", "admin",  "-padmin12345", "-e", "show schemas"]
-      retries: 20
-      interval: 10s
+  # appdb:
+  #   image: mysql
+  #   restart: always
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: admin12345
+  #     MYSQL_DATABASE: project-capstone
+  #   ports: 
+  #     - 3306:3306
+  #   volumes:
+  #     # - './data:/bitnami/mysql/data'
+  #     - './init:/docker-entrypoint-initdb.d'
+  #     - my-datavolume:/var/lib/mysql
+  #   healthcheck:
+  #     test: ["CMD", "mysql", "-u", "admin",  "-padmin12345", "-e", "show schemas"]
+  #     retries: 20
+  #     interval: 10s
 
   app:
     build: .
     restart: always
-    depends_on:
-      appdb:
-        condition: service_healthy
+    # depends_on:
+    #   appdb:
+    #     condition: service_healthy
     ports:
       - 8080:8080
   
