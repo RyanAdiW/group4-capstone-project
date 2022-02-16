@@ -53,21 +53,5 @@ func initConfig() *AppConfig {
 	defaultConfig.S3Config.AccessKey = os.Getenv("S3_ACCESS_KEY")
 	defaultConfig.S3Config.BucketName = os.Getenv("S3_BUCKET_NAME")
 
-	// viper.SetConfigType("yaml")
-	// viper.SetConfigName("config")
-	// viper.AddConfigPath("./config")
-
-	// if err := viper.ReadInConfig(); err != nil {
-	// 	log.Info("error to load config file, will use default value ", err)
-	// 	return &defaultConfig
-	// }
-
-	// var finalConfig AppConfig
-	// err := viper.Unmarshal(&finalConfig)
-	// if err != nil {
-	// 	log.Info("failed to extract config, will use default value")
-	// 	return &defaultConfig
-	// }
-
 	return &defaultConfig
 }
