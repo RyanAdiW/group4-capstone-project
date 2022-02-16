@@ -38,28 +38,26 @@ func (uc UserController) CreateUserController() echo.HandlerFunc {
 
 		//bind data photo
 		// Multipart form
-		form, err := c.MultipartForm()
-		if err != nil {
-			log.Println(err)
-			return err
-		}
-		files := form.File["photo"]
-
 		var url_photo string
-		for _, file := range files {
-			// Source
-			src, err := file.Open()
-			if err != nil {
-				log.Println(err)
-				return err
-			}
-			defer src.Close()
+		form, err := c.MultipartForm()
+		if err == nil {
+			files := form.File["photo"]
 
-			fileExtension := filepath.Ext(file.Filename)
-			filename := "profile_pics/" + userRequest.Email + fileExtension
-			url_photo, err = util.UploadToS3(&src, filename)
-			if err != nil {
-				return err
+			for _, file := range files {
+				// Source
+				src, err := file.Open()
+				if err != nil {
+					log.Println(err)
+					return err
+				}
+				defer src.Close()
+
+				fileExtension := filepath.Ext(file.Filename)
+				filename := "profile_pics/" + userRequest.Email + fileExtension
+				url_photo, err = util.UploadToS3(&src, filename)
+				if err != nil {
+					return err
+				}
 			}
 		}
 
