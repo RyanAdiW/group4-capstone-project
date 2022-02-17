@@ -17,10 +17,9 @@ Final Project
 
 
 <!-- CONTACT -->
-### 📮 Contact &nbsp;Contact
+### 📮 &nbsp;Contact
 
 [![GitHub Ryan](https://img.shields.io/badge/-Ryan-white?style=flat&logo=github&logoColor=black)](https://github.com/ryanadiw)
-
 [![GitHub Hilmi](https://img.shields.io/badge/-Hilmi-white?style=flat&logo=github&logoColor=black)](https://github.com/hilmihi)
 
 <p align="center">:copyright: 2022</p>
