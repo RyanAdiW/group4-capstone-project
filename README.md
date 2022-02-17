@@ -17,7 +17,7 @@ Final Project
 
 
 <!-- CONTACT -->
-### Contact
+### 📮 Contact &nbsp;Contact
 
 [![GitHub Ryan](https://img.shields.io/badge/-Ryan-white?style=flat&logo=github&logoColor=black)](https://github.com/ryanadiw)
 
