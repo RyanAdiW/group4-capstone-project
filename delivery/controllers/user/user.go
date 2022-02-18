@@ -83,6 +83,7 @@ func (uc UserController) CreateUserController() echo.HandlerFunc {
 			Photo:        url_photo,
 			Gender:       userRequest.Gender,
 			Address:      userRequest.Address,
+			Id_role:      userRequest.Id_role,
 		}
 
 		for _, v := range existingEmail {

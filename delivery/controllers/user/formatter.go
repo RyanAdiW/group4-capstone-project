@@ -9,4 +9,5 @@ type UserRequestFormat struct {
 	Photo        string `json:"photo" form:"photo"`
 	Gender       string `json:"gender" form:"gender"`
 	Address      string `json:"address" form:"address"`
+	Id_role      int    `json:"id_role" form:"id_role"`
 }
