@@ -14,14 +14,6 @@ type SuccessResponse struct {
 	Data    interface{} `json:"data"`
 }
 
-type SuccessResponseLogin struct {
-	Code            int         `json:"code"`
-	Status          string      `json:"status"`
-	Message         string      `json:"message"`
-	Data            interface{} `json:"data"`
-	CurrentUserName interface{} `json:"current_user_name"`
-}
-
 //NewInternalServerErrorResponse default internal server error response
 func SuccessOperationDefault(status, message string) DefaultResponse {
 	return DefaultResponse{
@@ -37,16 +29,6 @@ func SuccessOperation(status, message string, data interface{}) SuccessResponse 
 		status,
 		message,
 		data,
-	}
-}
-
-func SuccessOperationLogin(status, message string, user, currentUserName interface{}) SuccessResponseLogin {
-	return SuccessResponseLogin{
-		200,
-		status,
-		message,
-		user,
-		currentUserName,
 	}
 }
 

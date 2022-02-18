@@ -53,10 +53,17 @@ func (ac AuthController) LoginEmailController() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, common.BadRequest("unauthorized", "user not found"))
 		}
 
-		return c.JSON(http.StatusOK, map[string]interface{}{
-			"token":   token,
-			"email":   loginRequest.Email,
-			"user_id": uid,
-		})
+		// return c.JSON(http.StatusOK, map[string]interface{}{
+		// 	"token":   token,
+		// 	"email":   loginRequest.Email,
+		// 	"user_id": uid,
+		// })
+
+		data := LoginResponseFormat{
+			Token:         token,
+			Id_user:       uid,
+			Current_email: loginRequest.Email,
+		}
+		return c.JSON(http.StatusOK, common.SuccessOperation("success", "login success", data))
 	}
 }
