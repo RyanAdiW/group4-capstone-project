@@ -17,8 +17,8 @@ func NewUserRepo(db *sql.DB) *userRepo {
 }
 
 // create user
-func (ur *userRepo) Create(user entities.User) error {
-	query := (`INSERT INTO users (name, email, password, birth_date, phone_number, photo, gender, address, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, now(), now())`)
+func (ur *userRepo) Create(user entities.User, id_role int) error {
+	query := (`INSERT INTO users (name, email, password, birth_date, phone_number, photo, gender, address, created_at, updated_at, id_role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, now(), now(), ?)`)
 
 	statement, err := ur.db.Prepare(query)
 	if err != nil {
@@ -28,7 +28,7 @@ func (ur *userRepo) Create(user entities.User) error {
 
 	defer statement.Close()
 
-	_, err = statement.Exec(user.Name, user.Email, user.Password, user.Birth_date, user.Phone_number, user.Photo, user.Gender, user.Address)
+	_, err = statement.Exec(user.Name, user.Email, user.Password, user.Birth_date, user.Phone_number, user.Photo, user.Gender, user.Address, user.Id_role)
 	if err != nil {
 		log.Println(err)
 		return err
@@ -40,7 +40,10 @@ func (ur *userRepo) Create(user entities.User) error {
 // get all user
 func (ur *userRepo) Get() ([]entities.User, error) {
 	var users []entities.User
-	results, err := ur.db.Query("select id, name, email, birth_date, phone_number, photo, gender, address from users where deleted_at is null order by id asc")
+	results, err := ur.db.Query(`select u.id, u.name, u.email, u.birth_date, u.phone_number, u.photo, u.gender, u.address, r.id as id_role, r.description as role
+								from users u
+								join role r on r.id=u.id_role
+								where u.deleted_at is null order by u.id asc`)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -66,7 +69,10 @@ func (ur *userRepo) Get() ([]entities.User, error) {
 func (ur *userRepo) GetById(id int) (entities.User, error) {
 	var user entities.User
 
-	row := ur.db.QueryRow("SELECT id, name, email, birth_date, phone_number, photo, gender, address FROM users WHERE id = ? AND deleted_at IS NULL", id)
+	row := ur.db.QueryRow(`select u.id, u.name, u.email, u.birth_date, u.phone_number, u.photo, u.gender, u.address, r.id as id_role, r.description as role
+							from users u
+							join role r on r.id=u.id_role
+							WHERE u.id = ? AND u.deleted_at IS NULL`, id)
 
 	err := row.Scan(&user.Id, &user.Name, &user.Email, &user.Birth_date, &user.Phone_number, &user.Photo, &user.Gender, &user.Address)
 	if err != nil {
@@ -78,7 +84,7 @@ func (ur *userRepo) GetById(id int) (entities.User, error) {
 
 // update user
 func (ur *userRepo) Update(user entities.User, id int) error {
-	res, err := ur.db.Exec("UPDATE users SET name = ?, email = ?, birth_date = ?, phone_number = ?, photo = ?, gender = ?, address = ?, updated_at = now() WHERE id = ? AND deleted_at is null", user.Name, user.Email, user.Birth_date, user.Phone_number, user.Photo, user.Gender, user.Address, id)
+	res, err := ur.db.Exec("UPDATE users SET name = ?, email = ?, birth_date = ?, phone_number = ?, photo = ?, gender = ?, address = ?, id_role = ?, updated_at = now() WHERE id = ? AND deleted_at is null", user.Name, user.Email, user.Birth_date, user.Phone_number, user.Photo, user.Gender, user.Address, user.Id_role, id)
 	row, _ := res.RowsAffected()
 	if row == 0 {
 		return fmt.Errorf("id not found")
