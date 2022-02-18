@@ -3,10 +3,12 @@ package util
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"log"
 	"mime/multipart"
 	"sirclo/project/capstone/config"
+	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -47,4 +49,13 @@ func UploadToS3(file *multipart.File, filename string) (string, error) {
 	}
 
 	return output.Location, nil
+}
+
+func CheckExtension(extension string) error {
+	lowExtension := strings.ToLower(extension)
+
+	if lowExtension != ".jpg" && extension != ".png" && extension != ".jpeg" {
+		return fmt.Errorf("format file not supported")
+	}
+	return nil
 }

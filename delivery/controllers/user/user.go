@@ -53,6 +53,11 @@ func (uc UserController) CreateUserController() echo.HandlerFunc {
 				defer src.Close()
 
 				fileExtension := filepath.Ext(file.Filename)
+				errExt := util.CheckExtension(fileExtension)
+				if errExt != nil {
+					return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to join, photo format not allowed"))
+				}
+
 				filename := "profile_pics/" + userRequest.Email + fileExtension
 				url_photo, err = util.UploadToS3(&src, filename)
 				if err != nil {
