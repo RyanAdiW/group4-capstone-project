@@ -17,7 +17,7 @@ func NewUserRepo(db *sql.DB) *userRepo {
 }
 
 // create user
-func (ur *userRepo) Create(user entities.User, id_role int) error {
+func (ur *userRepo) Create(user entities.User) error {
 	query := (`INSERT INTO users (name, email, password, birth_date, phone_number, photo, gender, address, created_at, updated_at, id_role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, now(), now(), ?)`)
 
 	statement, err := ur.db.Prepare(query)
