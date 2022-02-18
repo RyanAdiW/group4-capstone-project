@@ -59,3 +59,12 @@ func CheckExtension(extension string) error {
 	}
 	return nil
 }
+
+func CheckSize(size int64) error {
+	if size <= 0 {
+		return fmt.Errorf("invalid file")
+	} else if size > 2097152 {
+		return fmt.Errorf("file size too big")
+	}
+	return nil
+}

@@ -53,9 +53,15 @@ func (uc UserController) CreateUserController() echo.HandlerFunc {
 				defer src.Close()
 
 				fileExtension := filepath.Ext(file.Filename)
-				errExt := util.CheckExtension(fileExtension)
-				if errExt != nil {
+				err = util.CheckExtension(fileExtension)
+				if err != nil {
 					return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to join, photo format not allowed"))
+				}
+
+				fileSize := file.Size
+				err = util.CheckSize(fileSize)
+				if err != nil {
+					return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to join, photo size too big"))
 				}
 
 				filename := "profile_pics/" + userRequest.Email + fileExtension
