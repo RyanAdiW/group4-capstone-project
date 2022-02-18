@@ -54,7 +54,7 @@ func (ur *userRepo) Get() ([]entities.User, error) {
 	for results.Next() {
 		var user entities.User
 
-		err = results.Scan(&user.Id, &user.Name, &user.Email, &user.Birth_date, &user.Phone_number, &user.Photo, &user.Gender, &user.Address)
+		err = results.Scan(&user.Id, &user.Name, &user.Email, &user.Birth_date, &user.Phone_number, &user.Photo, &user.Gender, &user.Address, &user.Id_role, &user.Role)
 		if err != nil {
 			fmt.Println(err)
 			return nil, err
@@ -74,7 +74,7 @@ func (ur *userRepo) GetById(id int) (entities.User, error) {
 							join role r on r.id=u.id_role
 							WHERE u.id = ? AND u.deleted_at IS NULL`, id)
 
-	err := row.Scan(&user.Id, &user.Name, &user.Email, &user.Birth_date, &user.Phone_number, &user.Photo, &user.Gender, &user.Address)
+	err := row.Scan(&user.Id, &user.Name, &user.Email, &user.Birth_date, &user.Phone_number, &user.Photo, &user.Gender, &user.Address, &user.Id_role, &user.Role)
 	if err != nil {
 		return user, err
 	}
