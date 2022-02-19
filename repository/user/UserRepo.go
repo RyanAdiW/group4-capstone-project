@@ -42,7 +42,7 @@ func (ur *userRepo) Get() ([]entities.User, error) {
 	var users []entities.User
 	results, err := ur.db.Query(`select u.id, u.name, u.email, u.birth_date, u.phone_number, u.photo, u.gender, u.address, r.id as id_role, r.description as role
 								from users u
-								join role r on r.id=u.id_role
+								join roles r on r.id=u.id_role
 								where u.deleted_at is null order by u.id asc`)
 	if err != nil {
 		fmt.Println(err)
@@ -71,7 +71,7 @@ func (ur *userRepo) GetById(id int) (entities.User, error) {
 
 	row := ur.db.QueryRow(`select u.id, u.name, u.email, u.birth_date, u.phone_number, u.photo, u.gender, u.address, r.id as id_role, r.description as role
 							from users u
-							join role r on r.id=u.id_role
+							join roles r on r.id=u.id_role
 							WHERE u.id = ? AND u.deleted_at IS NULL`, id)
 
 	err := row.Scan(&user.Id, &user.Name, &user.Email, &user.Birth_date, &user.Phone_number, &user.Photo, &user.Gender, &user.Address, &user.Id_role, &user.Role)
