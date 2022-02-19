@@ -18,7 +18,7 @@ func NewAuthRepo(db *sql.DB) *authRepo {
 }
 
 func (ar *authRepo) LoginEmail(email, password string) (string, error) {
-	result, err := ar.db.Query("select id, name, email, birth_date, phone_number, photo, gender, address FROM users WHERE email=? AND password=?", email, password)
+	result, err := ar.db.Query("select id, name, email, birth_date, phone_number, photo, gender, address, id_role FROM users WHERE email=? AND password=?", email, password)
 	if err != nil {
 		return "", err
 	}
@@ -26,11 +26,11 @@ func (ar *authRepo) LoginEmail(email, password string) (string, error) {
 		return "", fmt.Errorf("id not found")
 	}
 	var user entities.User
-	errScan := result.Scan(&user.Id, &user.Name, &user.Email, &user.Birth_date, &user.Phone_number, &user.Photo, &user.Gender, &user.Address)
+	errScan := result.Scan(&user.Id, &user.Name, &user.Email, &user.Birth_date, &user.Phone_number, &user.Photo, &user.Gender, &user.Address, &user.Id_role)
 	if errScan != nil {
 		return "", errScan
 	}
-	token, err := _middlewares.CreateToken(user.Id, user.Email)
+	token, err := _middlewares.CreateToken(user.Id, user.Email, user.Id_role)
 	if err != nil {
 		return "", err
 	}
