@@ -17,10 +17,10 @@ CREATE TABLE IF NOT EXISTS `users` (
   PRIMARY KEY (`id`),
   KEY `users_name` (`name`),
   KEY `users_FK` (`id_role`),
-  CONSTRAINT `users_FK` FOREIGN KEY (`id_role`) REFERENCES `role` (`id`)
+  CONSTRAINT `users_FK` FOREIGN KEY (`id_role`) REFERENCES `roles` (`id`)
 );
 
-CREATE TABLE IF NOT EXISTS `role` (
+CREATE TABLE IF NOT EXISTS `roles` (
   `id` int NOT NULL AUTO_INCREMENT,
   `description` varchar(255) NOT NULL,
   `created_date` datetime DEFAULT NULL,
