@@ -3,7 +3,7 @@ package entities
 type Asset struct {
 	Id               int    `json:"id" form:"id"`
 	Id_category      int    `json:"id_category" form:"id_category"`
-	Is_maintenence   bool   `json:"is_maintenence" form:"is_maintenence"`
+	Is_maintenance   bool   `json:"is_maintenance" form:"is_maintenance"`
 	Name             string `json:"name" form:"name"`
 	Description      string `json:"description" form:"description"`
 	Initial_quantity int    `json:"initial_quantity" form:"initial_quantity"`
@@ -15,7 +15,7 @@ type Asset struct {
 type SummaryAsset struct {
 	Total_asset int `json:"total_asset" form:"total_asset"`
 	Use         int `json:"use" form:"use"`
-	Maintenence int `json:"maintenence" form:"maintenence"`
+	Maintenance int `json:"maintenance" form:"maintenance"`
 	Available   int `json:"available" form:"available"`
 }
 

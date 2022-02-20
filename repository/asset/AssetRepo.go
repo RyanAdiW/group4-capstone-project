@@ -19,7 +19,7 @@ func NewAssetRepo(db *sql.DB) *assetRepo {
 
 // create asset
 func (ar *assetRepo) Create(asset entities.Asset) error {
-	query := (`INSERT INTO assets (id_category, is_maintenence, name, description, initial_quantity, avail_quantity, photo, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, now(), now())`)
+	query := (`INSERT INTO assets (id_category, is_maintenance, name, description, initial_quantity, avail_quantity, photo, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, now(), now())`)
 
 	statement, err := ar.db.Prepare(query)
 	if err != nil {
@@ -29,7 +29,7 @@ func (ar *assetRepo) Create(asset entities.Asset) error {
 
 	defer statement.Close()
 
-	_, err = statement.Exec(asset.Id_category, asset.Is_maintenence, asset.Name, asset.Description, asset.Initial_quantity, asset.Avail_quantity, asset.Photo)
+	_, err = statement.Exec(asset.Id_category, asset.Is_maintenance, asset.Name, asset.Description, asset.Initial_quantity, asset.Avail_quantity, asset.Photo)
 	if err != nil {
 		log.Println(err)
 		return err
@@ -54,7 +54,7 @@ func (ar *assetRepo) Get(category, keyword string) ([]entities.Asset, error) {
 		condition += " and a.name LIKE ? "
 	}
 	var assets []entities.Asset
-	results, err := ar.db.Query(`select a.id, a.id_category, a.is_maintenence, a.name, a.description, a.initial_quantity, a.avail_quantity, a.photo, c.description as category
+	results, err := ar.db.Query(`select a.id, a.id_category, a.is_maintenance, a.name, a.description, a.initial_quantity, a.avail_quantity, a.photo, c.description as category
 								from assets a
 								join categories c on c.id = a.id_category
 								where a.deleted_at is null`+condition+` order by a.id asc`, bind...)
@@ -68,7 +68,7 @@ func (ar *assetRepo) Get(category, keyword string) ([]entities.Asset, error) {
 	for results.Next() {
 		var asset entities.Asset
 
-		err = results.Scan(&asset.Id, &asset.Id_category, &asset.Is_maintenence, &asset.Name, &asset.Description, &asset.Initial_quantity, &asset.Avail_quantity, &asset.Photo, &asset.Category)
+		err = results.Scan(&asset.Id, &asset.Id_category, &asset.Is_maintenance, &asset.Name, &asset.Description, &asset.Initial_quantity, &asset.Avail_quantity, &asset.Photo, &asset.Category)
 		if err != nil {
 			log.Println(err)
 			return nil, err
@@ -83,12 +83,12 @@ func (ar *assetRepo) Get(category, keyword string) ([]entities.Asset, error) {
 func (ar *assetRepo) GetById(id int) (entities.Asset, error) {
 	var asset entities.Asset
 
-	row := ar.db.QueryRow(`select a.id, a.id_category, a.is_maintenence, a.name, a.description, a.initial_quantity, a.avail_quantity, a.photo, c.description as category
+	row := ar.db.QueryRow(`select a.id, a.id_category, a.is_maintenance, a.name, a.description, a.initial_quantity, a.avail_quantity, a.photo, c.description as category
 							from assets a
 							join categories c on c.id = a.id_category
 							where a.deleted_at is null and a.id = ? order by a.id asc`, id)
 
-	err := row.Scan(&asset.Id, &asset.Id_category, &asset.Is_maintenence, &asset.Name, &asset.Description, &asset.Initial_quantity, &asset.Avail_quantity, &asset.Photo, &asset.Category)
+	err := row.Scan(&asset.Id, &asset.Id_category, &asset.Is_maintenance, &asset.Name, &asset.Description, &asset.Initial_quantity, &asset.Avail_quantity, &asset.Photo, &asset.Category)
 	if err != nil {
 		return asset, err
 	}
@@ -144,7 +144,7 @@ func (ar *assetRepo) Delete(id int) error {
 
 func (ar *assetRepo) GetSummaryAsset() (entities.SummaryAsset, error) {
 	var summary entities.SummaryAsset
-	row := ar.db.QueryRow(`select all.total_asset, all.total_avail_asset, maintenence.total_asset_maintenence, (all.total_asset-all.total_avail_asset) as using
+	row := ar.db.QueryRow(`select all.total_asset, all.total_avail_asset, maintenance.total_asset_maintenance, (all.total_asset-all.total_avail_asset) as using
 							from (
 								SELECT 
 									sum(a.initial_quantity) as total_asset, sum(a.avail_quantity) as total_avail_asset
@@ -154,15 +154,15 @@ func (ar *assetRepo) GetSummaryAsset() (entities.SummaryAsset, error) {
 									where a.deleted_at is null order by a.id asc) AS all
 							JOIN (
 								SELECT 
-									sum(a.initial_quantity) as total_asset_maintenence
+									sum(a.initial_quantity) as total_asset_maintenance
 								FROM
 									assets a
 									join categories c on c.id = a.id_category
-									where a.deleted_at is null and a.is_maintenence = true order by a.id asc
-							) AS maintenence
+									where a.deleted_at is null and a.is_maintenance = true order by a.id asc
+							) AS maintenance
 							`)
 
-	err := row.Scan(&summary.Total_asset, &summary.Available, &summary.Maintenence, &summary.Use)
+	err := row.Scan(&summary.Total_asset, &summary.Available, &summary.Maintenance, &summary.Use)
 	if err != nil {
 		return summary, err
 	}
