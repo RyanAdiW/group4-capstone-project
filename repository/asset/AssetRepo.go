@@ -176,9 +176,10 @@ func (ar *assetRepo) GetHistoryUsage(id_asset int) (entities.HistoryUsage, error
 									r.id, r.id_user, r.id_asset, u.name as user_name, r.request_date, s.description as status
 								from assets a
 								join categories c on c.id = a.id_category and c.deleted_at is null
-								join request r on r.id_asset = a.id and r.deleted_at is null
+								join requests r on r.id_asset = a.id and r.deleted_at is null
 								join users u on u.id = r.id_user
-								join status_check s on s.id = r.id_status`)
+								join status_check s on s.id = r.id_status
+								WHERE id_asset = ?`, id_asset)
 	if err != nil {
 		log.Println(err)
 		return historyUsage, err

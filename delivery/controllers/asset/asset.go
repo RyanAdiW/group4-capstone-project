@@ -145,7 +145,7 @@ func (ac AssetController) UpdateAssetController() echo.HandlerFunc {
 		}
 
 		// get id from param
-		id_asset, errConv := strconv.Atoi(c.Param("id_asset"))
+		id_asset, errConv := strconv.Atoi(c.Param("id"))
 		if errConv != nil {
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to convert id"))
 		}
@@ -205,7 +205,7 @@ func (ac AssetController) DeleteAssetController() echo.HandlerFunc {
 		}
 
 		// get id from param
-		id_asset, errConv := strconv.Atoi(c.Param("id_asset"))
+		id_asset, errConv := strconv.Atoi(c.Param("id"))
 		if errConv != nil {
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to convert id"))
 		}
@@ -231,6 +231,7 @@ func (ac AssetController) GetSummaryAssetsController() echo.HandlerFunc {
 
 		summary, err := ac.repository.GetSummaryAsset()
 		if err != nil {
+			fmt.Println(err)
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to fetch data"))
 		}
 		return c.JSON(http.StatusOK, response.SuccessOperation("success", "success get summary assets", summary))
@@ -247,8 +248,9 @@ func (ac AssetController) GetHistoryUsageController() echo.HandlerFunc {
 		}
 
 		// get id from param
-		id_asset, errConv := strconv.Atoi(c.Param("id_asset"))
+		id_asset, errConv := strconv.Atoi(c.Param("id"))
 		if errConv != nil {
+			fmt.Println(errConv)
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to convert id"))
 		}
 
