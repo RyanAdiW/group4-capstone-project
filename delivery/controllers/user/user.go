@@ -4,11 +4,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"path/filepath"
 	"strconv"
 
 	"sirclo/project/capstone/entities"
-	"sirclo/project/capstone/util"
 
 	response "sirclo/project/capstone/delivery/common"
 	middlewares "sirclo/project/capstone/delivery/middleware"
@@ -36,42 +34,6 @@ func (uc UserController) CreateUserController() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to bind data"))
 		}
 
-		//bind data photo
-		// Multipart form
-		var url_photo string
-		form, err := c.MultipartForm()
-		if err == nil {
-			files := form.File["photo"]
-
-			for _, file := range files {
-				// Source
-				src, err := file.Open()
-				if err != nil {
-					log.Println(err)
-					return err
-				}
-				defer src.Close()
-
-				fileExtension := filepath.Ext(file.Filename)
-				err = util.CheckExtension(fileExtension)
-				if err != nil {
-					return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to join, photo format not allowed"))
-				}
-
-				fileSize := file.Size
-				err = util.CheckSize(fileSize)
-				if err != nil {
-					return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to join, photo size too big"))
-				}
-
-				filename := "profile_pics/" + userRequest.Email + fileExtension
-				url_photo, err = util.UploadToS3(&src, filename)
-				if err != nil {
-					return err
-				}
-			}
-		}
-
 		//set password
 		password := []byte(userRequest.Password)
 
@@ -86,15 +48,11 @@ func (uc UserController) CreateUserController() echo.HandlerFunc {
 		}
 
 		user := entities.User{
-			Name:         userRequest.Name,
-			Email:        userRequest.Email,
-			Password:     string(hashedPassword),
-			Birth_date:   userRequest.Birth_date,
-			Phone_number: userRequest.Phone_number,
-			Photo:        url_photo,
-			Gender:       userRequest.Gender,
-			Address:      userRequest.Address,
-			Id_role:      userRequest.Id_role,
+			Name:     userRequest.Name,
+			Email:    userRequest.Email,
+			Password: string(hashedPassword),
+			Divisi:   userRequest.Divisi,
+			Id_role:  userRequest.Id_role,
 		}
 
 		for _, v := range existingEmail {
@@ -104,7 +62,7 @@ func (uc UserController) CreateUserController() echo.HandlerFunc {
 		}
 
 		// create user to database
-		err = uc.repository.Create(user)
+		err := uc.repository.Create(user)
 		if err != nil {
 			log.Println(err)
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to create user"))
@@ -175,31 +133,6 @@ func (uc UserController) UpdateUserController() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to encrpyt password"))
 		}
 
-		//bind data photo
-		// Multipart form
-		var url_photo string
-		form, err := c.MultipartForm()
-		if err == nil {
-			files := form.File["photo"]
-
-			for _, file := range files {
-				// Source
-				src, err := file.Open()
-				if err != nil {
-					log.Println(err)
-					return err
-				}
-				defer src.Close()
-
-				fileExtension := filepath.Ext(file.Filename)
-				filename := "profile_pics/" + user.Email + fileExtension
-				url_photo, err = util.UploadToS3(&src, filename)
-				if err != nil {
-					return err
-				}
-			}
-		}
-		user.Photo = url_photo
 		user.Password = string(hashedPassword)
 		// update user based on id to database
 		errUpdate := uc.repository.Update(user, userId)

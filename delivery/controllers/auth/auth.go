@@ -43,13 +43,11 @@ func (ac AuthController) LoginEmailController() echo.HandlerFunc {
 		// get token from login credential
 		token, err := ac.repository.LoginEmail(loginRequest.Email, hashedPassword)
 		if err != nil {
-			fmt.Println("error 2")
 			return c.JSON(http.StatusBadRequest, common.BadRequest("unauthorized", "user not found"))
 		}
 
 		uid, _ := ac.repository.GetIdByEmail(loginRequest.Email)
 		if err != nil {
-			fmt.Println("error 3")
 			return c.JSON(http.StatusBadRequest, common.BadRequest("unauthorized", "user not found"))
 		}
 
