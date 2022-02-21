@@ -8,4 +8,8 @@ type Request struct {
 	Request_date string `json:"request_date" form:"request_date"`
 	Return_date  string `json:"return_date" form:"return_date"`
 	Description  string `json:"description" form:"description"`
+	User_name    string `json:"user_name" form:"user_name"`
+	Asset_name   string `json:"asset_name" form:"asset_name"`
+	Category     string `json:"category" form:"category"`
+	Status       string `json:"status" form:"status"`
 }
