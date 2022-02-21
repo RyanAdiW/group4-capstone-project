@@ -3,6 +3,7 @@ package route
 import (
 	"sirclo/project/capstone/delivery/controllers/asset"
 	"sirclo/project/capstone/delivery/controllers/auth"
+	"sirclo/project/capstone/delivery/controllers/request"
 	"sirclo/project/capstone/delivery/controllers/user"
 
 	middlewares "sirclo/project/capstone/delivery/middleware"
@@ -14,7 +15,8 @@ func RegisterPath(
 	e *echo.Echo,
 	loginController *auth.AuthController,
 	userController *user.UserController,
-	assetController *asset.AssetController) {
+	assetController *asset.AssetController,
+	requestController *request.RequestController) {
 
 	// login
 	e.POST("/login", loginController.LoginEmailController())
@@ -34,4 +36,9 @@ func RegisterPath(
 	e.GET("assets/history/:id", assetController.GetHistoryUsageController(), middlewares.JWTMiddleware())
 	e.PUT("assets/:id", assetController.UpdateAssetController(), middlewares.JWTMiddleware())
 	e.DELETE("assets/:id", assetController.DeleteAssetController(), middlewares.JWTMiddleware())
+
+	// request
+	e.POST("/requests", requestController.CreateRequestEmployee(), middlewares.JWTMiddleware())
+	e.GET("requests/:id", requestController.GetRequestByIdController(), middlewares.JWTMiddleware())
+	e.PUT("requests/:id", requestController.UpdateRequestStatus(), middlewares.JWTMiddleware())
 }

@@ -70,3 +70,19 @@ func (ar *authRepo) GetIdByEmail(email string) (int, error) {
 	userId := user.Id
 	return userId, nil
 }
+func (ar *authRepo) GetIdRole(email string) (int, error) {
+	result, err := ar.db.Query("SELECT id_role FROM users WHERE email=?", email)
+	if err != nil {
+		return 0, err
+	}
+	if isExist := result.Next(); !isExist {
+		return 0, fmt.Errorf("id not found")
+	}
+	var user entities.User
+	errScan := result.Scan(&user.Id_role)
+	if errScan != nil {
+		return 0, errScan
+	}
+	roleId := user.Id_role
+	return roleId, nil
+}
