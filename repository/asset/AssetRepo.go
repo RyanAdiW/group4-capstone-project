@@ -97,7 +97,7 @@ func (ar *assetRepo) GetById(id int) (entities.Asset, error) {
 }
 
 // update asset
-func (ar *assetRepo) Update(asset entities.Asset, id int) error {
+func (ar *assetRepo) Update(assetExisted, asset entities.Asset, id int) error {
 	query := `UPDATE assets SET`
 	var bind []interface{}
 
@@ -119,7 +119,26 @@ func (ar *assetRepo) Update(asset entities.Asset, id int) error {
 	if asset.Initial_quantity != 0 {
 		bind = append(bind, asset.Initial_quantity)
 		query += " initial_quantity = ?,"
+
+		if asset.Initial_quantity > assetExisted.Initial_quantity {
+			diff := asset.Initial_quantity - assetExisted.Initial_quantity
+			upd_avail := diff + assetExisted.Avail_quantity
+			bind = append(bind, upd_avail)
+			query += " avail_quantity = ?,"
+		}
+
+		if asset.Initial_quantity < assetExisted.Avail_quantity {
+			return fmt.Errorf("Your quantity is lower than expected!")
+		}
 	}
+
+	if asset.Photo != "" {
+		bind = append(bind, asset.Photo)
+		query += " photo = ?,"
+	}
+
+	bind = append(bind, asset.Is_maintenance)
+	query += " is_maintenance = ?,"
 
 	bind = append(bind, id)
 	query += " updated_at = now() WHERE id = ? AND deleted_at is null"
