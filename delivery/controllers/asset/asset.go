@@ -184,6 +184,17 @@ func (ac AssetController) UpdateAssetController() echo.HandlerFunc {
 				defer src.Close()
 
 				fileExtension := filepath.Ext(file.Filename)
+				err = util.CheckExtension(fileExtension)
+				if err != nil {
+					return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to join, photo format not allowed"))
+				}
+
+				fileSize := file.Size
+				err = util.CheckSize(fileSize)
+				if err != nil {
+					return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to join, photo size too big"))
+				}
+
 				filename := "assets_pic/" + strconv.Itoa(asset.Id_category) + "_" + name + fileExtension
 				url_photo, err = util.UploadToS3(&src, filename)
 				if err != nil {
