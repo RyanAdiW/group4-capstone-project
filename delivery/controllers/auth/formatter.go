@@ -8,5 +8,6 @@ type LoginEmailRequestFormat struct {
 type LoginResponseFormat struct {
 	Token         string `json:"token" form:"token"`
 	Id_user       int    `json:"id_user" form:"id_user"`
+	Id_role       int    `json:"id_role" form:"id_role"`
 	Current_email string `json:"current_email" form:"current_email"`
 }
