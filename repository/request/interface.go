@@ -5,7 +5,7 @@ import (
 )
 
 type RequestRepo interface {
-	GetById(int) (entities.Request, error)
 	Create(entities.Request) error
+	GetById(int) (entities.Request, error)
 	Update(entities.Request, int) error
 }
