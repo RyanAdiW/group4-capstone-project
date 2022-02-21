@@ -31,33 +31,22 @@ func (ac AuthController) LoginEmailController() echo.HandlerFunc {
 
 		hashedPassword, errPass := ac.repository.GetPasswordByEmail(loginRequest.Email)
 		if errPass != nil {
-			return c.JSON(http.StatusBadRequest, common.BadRequest("unauthorized", "user not found"))
+			return c.JSON(http.StatusBadRequest, common.BadRequest("unauthorized", "email not found"))
 		}
 
 		errMatch := bcrypt.CompareHashAndPassword([]byte(hashedPassword), password)
 		if errMatch != nil {
 			fmt.Println(errMatch)
-			return c.JSON(http.StatusBadRequest, common.BadRequest("unauthorized", "user not found"))
+			return c.JSON(http.StatusBadRequest, common.BadRequest("unauthorized", "failed to encrypt"))
 		}
 
 		// get token from login credential
 		token, err := ac.repository.LoginEmail(loginRequest.Email, hashedPassword)
 		if err != nil {
-			fmt.Println("error 2")
-			return c.JSON(http.StatusBadRequest, common.BadRequest("unauthorized", "user not found"))
+			return c.JSON(http.StatusBadRequest, common.BadRequest("unauthorized", "failed to create token"))
 		}
 
 		uid, _ := ac.repository.GetIdByEmail(loginRequest.Email)
-		if err != nil {
-			fmt.Println("error 3")
-			return c.JSON(http.StatusBadRequest, common.BadRequest("unauthorized", "user not found"))
-		}
-
-		// return c.JSON(http.StatusOK, map[string]interface{}{
-		// 	"token":   token,
-		// 	"email":   loginRequest.Email,
-		// 	"user_id": uid,
-		// })
 
 		data := LoginResponseFormat{
 			Token:         token,
