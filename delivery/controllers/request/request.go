@@ -3,6 +3,7 @@ package request
 import (
 	"log"
 	"net/http"
+	"strconv"
 
 	response "sirclo/project/capstone/delivery/common"
 	middlewares "sirclo/project/capstone/delivery/middleware"
@@ -51,5 +52,27 @@ func (rr RequestController) CreateRequestEmployee() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to create request"))
 		}
 		return c.JSON(http.StatusOK, response.SuccessOperationDefault("success", "success create request"))
+	}
+}
+
+// 2. get request details by id
+func (rr RequestController) GetRequestByIdController() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		_, err := middlewares.GetIdRole(c)
+		if err != nil {
+			return c.JSON(http.StatusUnauthorized, response.UnauthorizedRequest("unauthorized", "unauthorized access"))
+		}
+
+		// get id from param
+		requestId, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to convert id"))
+		}
+
+		request, err := rr.repository.GetById(requestId)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to fetch data"))
+		}
+		return c.JSON(http.StatusOK, response.SuccessOperation("success", "success get asset", request))
 	}
 }
