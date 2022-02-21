@@ -144,14 +144,14 @@ func (ar *assetRepo) Delete(id int) error {
 
 func (ar *assetRepo) GetSummaryAsset() (entities.SummaryAsset, error) {
 	var summary entities.SummaryAsset
-	row := ar.db.QueryRow(`select all.total_asset, all.total_avail_asset, maintenance.total_asset_maintenance, (all.total_asset-all.total_avail_asset) as using
+	row := ar.db.QueryRow(`select all_asset.total_asset, all_asset.total_avail_asset, maintenance.total_asset_maintenance
 							from (
 								SELECT 
 									sum(a.initial_quantity) as total_asset, sum(a.avail_quantity) as total_avail_asset
 								FROM
 									assets a
 									join categories c on c.id = a.id_category
-									where a.deleted_at is null order by a.id asc) AS all
+									where a.deleted_at is null order by a.id asc) AS all_asset
 							JOIN (
 								SELECT 
 									sum(a.initial_quantity) as total_asset_maintenance
@@ -162,10 +162,11 @@ func (ar *assetRepo) GetSummaryAsset() (entities.SummaryAsset, error) {
 							) AS maintenance
 							`)
 
-	err := row.Scan(&summary.Total_asset, &summary.Available, &summary.Maintenance, &summary.Use)
+	err := row.Scan(&summary.Total_asset, &summary.Available, &summary.Maintenance)
 	if err != nil {
 		return summary, err
 	}
+	summary.Use = summary.Total_asset - summary.Available
 
 	return summary, nil
 }
@@ -176,7 +177,7 @@ func (ar *assetRepo) GetHistoryUsage(id_asset int) (entities.HistoryUsage, error
 									r.id, r.id_user, r.id_asset, u.name as user_name, r.request_date, s.description as status
 								from assets a
 								join categories c on c.id = a.id_category and c.deleted_at is null
-								join requests r on r.id_asset = a.id and r.deleted_at is null
+								left join requests r on r.id_asset = a.id and r.deleted_at is null
 								join users u on u.id = r.id_user
 								join status_check s on s.id = r.id_status
 								WHERE a.id = ?`, id_asset)
