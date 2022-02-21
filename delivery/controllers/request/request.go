@@ -76,3 +76,32 @@ func (rr RequestController) GetRequestByIdController() echo.HandlerFunc {
 		return c.JSON(http.StatusOK, response.SuccessOperation("success", "success get asset", request))
 	}
 }
+
+// 3. update status request
+func (rr RequestController) UpdateRequestStatus() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		idRole, err := middlewares.GetIdRole(c)
+		if err != nil || idRole == 2 {
+			return c.JSON(http.StatusUnauthorized, response.UnauthorizedRequest("unauthorized", "unauthorized access"))
+		}
+
+		// get id from param
+		id_request, errConv := strconv.Atoi(c.Param("id"))
+		if errConv != nil {
+			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to convert id"))
+		}
+
+		// binding data
+		request := entities.Request{}
+		if errBind := c.Bind(&request); errBind != nil {
+			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to bind data"))
+		}
+
+		// update request based on id to database
+		errUpdate := rr.repository.Update(request, id_request)
+		if errUpdate != nil {
+			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", errUpdate.Error()))
+		}
+		return c.JSON(http.StatusOK, response.SuccessOperationDefault("success", "success update request"))
+	}
+}
