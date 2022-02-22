@@ -3,6 +3,10 @@
 ### 💻 &nbsp;About The Project
 Final Project
 
+### 🕮 &nbsp;OpenAPI Documentation
+
+See documentation [here](https://app.swaggerhub.com/apis-docs/RyanAdiW/Employee-Assets-Management/1.0.0-oas3).
+
 ### 🛠 &nbsp;Built With
 
 ![Golang](https://img.shields.io/badge/-Golang-05122A?style=flat&logo=go&logoColor=4479A1)&nbsp;
