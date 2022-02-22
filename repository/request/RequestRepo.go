@@ -44,7 +44,7 @@ func (rr *requestRepo) GetById(id int) (entities.Request, error) {
 		join status_check s on s.id = r.id_status
 		join assets a on a.id = r.id_asset
 			join categories c on c.id = a.id_category
-		where r.id = ?`, id)
+		where r.id = ? and r.deleted_at is nul`, id)
 		err := row.Scan(&request.Id, &request.Id_user, &request.Id_asset, &request.Id_status, &request.Request_date, &request.Return_date, &request.Description, &request.User_name, &request.Asset_name, &request.Category, &request.Avail_quantity, &request.Status)
 		if err != nil {
 			log.Println(err)
@@ -100,4 +100,34 @@ func (rr *requestRepo) Update(request entities.Request, id int) error {
 		return fmt.Errorf("id not found")
 	}
 	return err
+}
+
+// update available quantity asset
+func (rr *requestRepo) UpdateAvailQty(quantity, id int) error {
+	query := (`update requests r 
+	join assets a on a.id = r.id_asset
+	set avail_quantity = ?
+	where r.id = ?`)
+
+	res, err := rr.db.Exec(query, quantity, id)
+	row, _ := res.RowsAffected()
+	if row == 0 {
+		return fmt.Errorf("id not found")
+	}
+	return err
+}
+
+// get asset available qty based on id_asset
+func (rr *requestRepo) GetAvailQty(id int) (entities.Request, error) {
+	var request entities.Request
+
+	row := rr.db.QueryRow(`select r.id, r.id_asset, a.initial_quantity, a.avail_quantity from requests r
+	join assets a on a.id = r.id_asset
+	where r.id = ? and r.deleted_at is null`, id)
+
+	err := row.Scan(&request.Id, &request.Id_asset, &request.Initial_quantity, &request.Avail_quantity)
+	if err != nil {
+		return request, err
+	}
+	return request, nil
 }

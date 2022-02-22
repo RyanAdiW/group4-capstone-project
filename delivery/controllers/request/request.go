@@ -183,6 +183,32 @@ func (rr RequestController) UpdateRequestStatus() echo.HandlerFunc {
 		if errUpdate != nil {
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", errUpdate.Error()))
 		}
+
+		// if status == 6 (diterima)
+		if request.Id_status == 6 {
+			// get current avail qty
+			availQty, _ := rr.repository.GetAvailQty(id_request)
+			if availQty.Avail_quantity >= 0 {
+				qty := availQty.Avail_quantity - 1
+				err := rr.repository.UpdateAvailQty(qty, id_request)
+				if err != nil {
+					return c.JSON(http.StatusBadRequest, response.BadRequest("failed", errUpdate.Error()))
+				}
+			}
+		}
+		// if status == 8 berhasil dikembalikan
+		if request.Id_status == 8 {
+			// get current avail qty
+			availQty, _ := rr.repository.GetAvailQty(id_request)
+			if availQty.Avail_quantity < availQty.Initial_quantity {
+				qty := availQty.Avail_quantity + 1
+				err := rr.repository.UpdateAvailQty(qty, id_request)
+				if err != nil {
+					return c.JSON(http.StatusBadRequest, response.BadRequest("failed", errUpdate.Error()))
+				}
+			}
+		}
+
 		return c.JSON(http.StatusOK, response.SuccessOperationDefault("success", "success update request"))
 	}
 }
