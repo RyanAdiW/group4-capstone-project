@@ -134,7 +134,7 @@ func (rr RequestController) UpdateRequestStatus() echo.HandlerFunc {
 			status check id
 			1: menunggu persetujuan admin
 			2: menunggu persetujuan manager
-			3: disetujui managet
+			3: disetujui manager
 			4: ditolak manager
 			5: ditolak admin
 			6: diterima
@@ -155,7 +155,7 @@ func (rr RequestController) UpdateRequestStatus() echo.HandlerFunc {
 				if request.Id_status != 5 {
 					if request.Id_status != 6 {
 						if request.Id_status != 7 {
-							return c.JSON(http.StatusUnauthorized, response.UnauthorizedRequest("unauthorized", "unauthorized access"))
+							return c.JSON(http.StatusUnauthorized, response.UnauthorizedRequest("unauthorized", "id_status must be 2 || 5 || 6 || 7"))
 						}
 					}
 				}
@@ -165,7 +165,7 @@ func (rr RequestController) UpdateRequestStatus() echo.HandlerFunc {
 		// employee
 		if idRole == 2 {
 			if request.Id_status != 8 {
-				return c.JSON(http.StatusUnauthorized, response.UnauthorizedRequest("unauthorized", "unauthorized access"))
+				return c.JSON(http.StatusUnauthorized, response.UnauthorizedRequest("unauthorized", "id_status must be 8"))
 			}
 		}
 
@@ -173,7 +173,7 @@ func (rr RequestController) UpdateRequestStatus() echo.HandlerFunc {
 		if idRole == 3 {
 			if request.Id_status != 3 {
 				if request.Id_status != 4 {
-					return c.JSON(http.StatusUnauthorized, response.UnauthorizedRequest("unauthorized", "unauthorized access"))
+					return c.JSON(http.StatusUnauthorized, response.UnauthorizedRequest("unauthorized", "id_status must be 3 || 4"))
 				}
 			}
 		}
