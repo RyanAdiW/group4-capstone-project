@@ -45,13 +45,46 @@ func (rr RequestController) CreateRequestEmployee() echo.HandlerFunc {
 			Description: requestReq.Descrition,
 		}
 
-		// create user to database
+		// create request to database
 		err = rr.repository.Create(request)
 		if err != nil {
 			log.Println(err)
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to create request"))
 		}
 		return c.JSON(http.StatusOK, response.SuccessOperationDefault("success", "success create request"))
+	}
+}
+
+// 2. assign asset to employee (admin)
+func (rr RequestController) AssignAssetEmployee() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		idRole, err := middlewares.GetIdRole(c)
+		if err != nil || idRole != 1 {
+			return c.JSON(http.StatusUnauthorized, response.UnauthorizedRequest("unauthorized", "unauthorized access"))
+		}
+
+		// bind data
+		var requestReq RequestFormat
+		if err := c.Bind(&requestReq); err != nil {
+			log.Println(err)
+			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to bind data"))
+		}
+
+		request := entities.Request{
+			Id_user:     requestReq.Id_user,
+			Id_asset:    requestReq.Id_asset,
+			Id_status:   2,
+			Return_date: requestReq.Return_date,
+			Description: requestReq.Descrition,
+		}
+
+		// create request to database
+		err = rr.repository.Create(request)
+		if err != nil {
+			log.Println(err)
+			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to assign asset"))
+		}
+		return c.JSON(http.StatusOK, response.SuccessOperationDefault("success", "success assign asset"))
 	}
 }
 
@@ -77,11 +110,11 @@ func (rr RequestController) GetRequestByIdController() echo.HandlerFunc {
 	}
 }
 
-// 3. update status request
+// 3. update status request admin
 func (rr RequestController) UpdateRequestStatus() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		idRole, err := middlewares.GetIdRole(c)
-		if err != nil || idRole == 2 {
+		if err != nil {
 			return c.JSON(http.StatusUnauthorized, response.UnauthorizedRequest("unauthorized", "unauthorized access"))
 		}
 
@@ -93,8 +126,56 @@ func (rr RequestController) UpdateRequestStatus() echo.HandlerFunc {
 
 		// binding data
 		request := entities.Request{}
+
 		if errBind := c.Bind(&request); errBind != nil {
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to bind data"))
+		}
+		/*
+			status check id
+			1: menunggu persetujuan admin
+			2: menunggu persetujuan manager
+			3: disetujui managet
+			4: ditolak manager
+			5: ditolak admin
+			6: diterima
+			7: minta dikembalikan
+			8: berhasil dikembalikan
+		*/
+
+		/*
+			role
+			1: admin
+			2: employee
+			3: manager
+		*/
+
+		// admin
+		if idRole == 1 {
+			if request.Id_status != 2 {
+				if request.Id_status != 5 {
+					if request.Id_status != 6 {
+						if request.Id_status != 7 {
+							return c.JSON(http.StatusUnauthorized, response.UnauthorizedRequest("unauthorized", "unauthorized access"))
+						}
+					}
+				}
+			}
+		}
+
+		// employee
+		if idRole == 2 {
+			if request.Id_status != 8 {
+				return c.JSON(http.StatusUnauthorized, response.UnauthorizedRequest("unauthorized", "unauthorized access"))
+			}
+		}
+
+		// manager
+		if idRole == 3 {
+			if request.Id_status != 3 {
+				if request.Id_status != 4 {
+					return c.JSON(http.StatusUnauthorized, response.UnauthorizedRequest("unauthorized", "unauthorized access"))
+				}
+			}
 		}
 
 		// update request based on id to database
