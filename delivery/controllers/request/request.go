@@ -21,11 +21,11 @@ func NewRequestController(request requestRepo.RequestRepo) *RequestController {
 	return &RequestController{repository: request}
 }
 
-// 1. create request (employee)
+// 1. create request
 func (rr RequestController) CreateRequestEmployee() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		idRole, err := middlewares.GetIdRole(c)
-		if err != nil || idRole != 2 {
+		if err != nil || idRole == 3 {
 			return c.JSON(http.StatusUnauthorized, response.UnauthorizedRequest("unauthorized", "unauthorized access"))
 		}
 
@@ -36,13 +36,27 @@ func (rr RequestController) CreateRequestEmployee() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to bind data"))
 		}
 
-		idUser, _ := middlewares.GetId(c)
-		request := entities.Request{
-			Id_user:     idUser,
-			Id_asset:    requestReq.Id_asset,
-			Id_status:   1,
-			Return_date: requestReq.Return_date,
-			Description: requestReq.Descrition,
+		var request entities.Request
+
+		if idRole == 2 {
+			idUser, _ := middlewares.GetId(c)
+			request = entities.Request{
+				Id_user:     idUser,
+				Id_asset:    requestReq.Id_asset,
+				Id_status:   1,
+				Return_date: requestReq.Return_date,
+				Description: requestReq.Descrition,
+			}
+		}
+
+		if idRole == 1 {
+			request = entities.Request{
+				Id_user:     requestReq.Id_user,
+				Id_asset:    requestReq.Id_asset,
+				Id_status:   2,
+				Return_date: requestReq.Return_date,
+				Description: requestReq.Descrition,
+			}
 		}
 
 		// create request to database
@@ -52,39 +66,6 @@ func (rr RequestController) CreateRequestEmployee() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to create request"))
 		}
 		return c.JSON(http.StatusOK, response.SuccessOperationDefault("success", "success create request"))
-	}
-}
-
-// 2. assign asset to employee (admin)
-func (rr RequestController) AssignAssetEmployee() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		idRole, err := middlewares.GetIdRole(c)
-		if err != nil || idRole != 1 {
-			return c.JSON(http.StatusUnauthorized, response.UnauthorizedRequest("unauthorized", "unauthorized access"))
-		}
-
-		// bind data
-		var requestReq RequestFormat
-		if err := c.Bind(&requestReq); err != nil {
-			log.Println(err)
-			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to bind data"))
-		}
-
-		request := entities.Request{
-			Id_user:     requestReq.Id_user,
-			Id_asset:    requestReq.Id_asset,
-			Id_status:   2,
-			Return_date: requestReq.Return_date,
-			Description: requestReq.Descrition,
-		}
-
-		// create request to database
-		err = rr.repository.Create(request)
-		if err != nil {
-			log.Println(err)
-			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to assign asset"))
-		}
-		return c.JSON(http.StatusOK, response.SuccessOperationDefault("success", "success assign asset"))
 	}
 }
 
