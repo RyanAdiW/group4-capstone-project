@@ -22,7 +22,7 @@ func NewRequestController(request requestRepo.RequestRepo) *RequestController {
 }
 
 // 1. create request
-func (rr RequestController) CreateRequestEmployee() echo.HandlerFunc {
+func (rc RequestController) CreateRequestEmployee() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		idRole, err := middlewares.GetIdRole(c)
 		if err != nil || idRole == 3 {
@@ -60,7 +60,7 @@ func (rr RequestController) CreateRequestEmployee() echo.HandlerFunc {
 		}
 
 		// create request to database
-		err = rr.repository.Create(request)
+		err = rc.repository.Create(request)
 		if err != nil {
 			log.Println(err)
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to create request"))
@@ -70,7 +70,7 @@ func (rr RequestController) CreateRequestEmployee() echo.HandlerFunc {
 }
 
 // 2. get request details by id
-func (rr RequestController) GetRequestByIdController() echo.HandlerFunc {
+func (rc RequestController) GetRequestByIdController() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		_, err := middlewares.GetIdRole(c)
 		if err != nil {
@@ -83,7 +83,7 @@ func (rr RequestController) GetRequestByIdController() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to convert id"))
 		}
 
-		request, err := rr.repository.GetById(requestId)
+		request, err := rc.repository.GetById(requestId)
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to fetch data"))
 		}
@@ -92,7 +92,7 @@ func (rr RequestController) GetRequestByIdController() echo.HandlerFunc {
 }
 
 // 3. update status request admin
-func (rr RequestController) UpdateRequestStatus() echo.HandlerFunc {
+func (rc RequestController) UpdateRequestStatus() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		idRole, err := middlewares.GetIdRole(c)
 		if err != nil {
@@ -160,7 +160,7 @@ func (rr RequestController) UpdateRequestStatus() echo.HandlerFunc {
 		}
 
 		// update request based on id to database
-		errUpdate := rr.repository.Update(request, id_request)
+		errUpdate := rc.repository.Update(request, id_request)
 		if errUpdate != nil {
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", errUpdate.Error()))
 		}
@@ -168,10 +168,10 @@ func (rr RequestController) UpdateRequestStatus() echo.HandlerFunc {
 		// if status == 6 (diterima)
 		if request.Id_status == 6 {
 			// get current avail qty
-			availQty, _ := rr.repository.GetAvailQty(id_request)
+			availQty, _ := rc.repository.GetAvailQty(id_request)
 			if availQty.Avail_quantity >= 0 {
 				qty := availQty.Avail_quantity - 1
-				err := rr.repository.UpdateAvailQty(qty, id_request)
+				err := rc.repository.UpdateAvailQty(qty, id_request)
 				if err != nil {
 					return c.JSON(http.StatusBadRequest, response.BadRequest("failed", errUpdate.Error()))
 				}
@@ -180,10 +180,10 @@ func (rr RequestController) UpdateRequestStatus() echo.HandlerFunc {
 		// if status == 8 berhasil dikembalikan
 		if request.Id_status == 8 {
 			// get current avail qty
-			availQty, _ := rr.repository.GetAvailQty(id_request)
+			availQty, _ := rc.repository.GetAvailQty(id_request)
 			if availQty.Avail_quantity < availQty.Initial_quantity {
 				qty := availQty.Avail_quantity + 1
-				err := rr.repository.UpdateAvailQty(qty, id_request)
+				err := rc.repository.UpdateAvailQty(qty, id_request)
 				if err != nil {
 					return c.JSON(http.StatusBadRequest, response.BadRequest("failed", errUpdate.Error()))
 				}
@@ -191,5 +191,16 @@ func (rr RequestController) UpdateRequestStatus() echo.HandlerFunc {
 		}
 
 		return c.JSON(http.StatusOK, response.SuccessOperationDefault("success", "success update request"))
+	}
+}
+
+// 4. get requests
+func (rc *RequestController) GetRequestsController() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		requests, err := rc.repository.Get()
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to fetch data"))
+		}
+		return c.JSON(http.StatusOK, response.SuccessOperation("success", "success get all request", requests))
 	}
 }

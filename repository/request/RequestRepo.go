@@ -131,3 +131,32 @@ func (rr *requestRepo) GetAvailQty(id int) (entities.Request, error) {
 	}
 	return request, nil
 }
+
+// get requests
+func (rr *requestRepo) Get() ([]entities.Request, error) {
+	var requests []entities.Request
+	res, err := rr.db.Query(`select r.id, r.id_user, r.id_asset, r.id_status, r.request_date, r.return_date, r.description, u.name as user_name, a.name as asset_name, c.description as category, a.avail_quantity, s.description as status 
+	from requests r
+	join users u on u.id = r.id_user
+	join status_check s on s.id = r.id_status
+	join assets a on a.id = r.id_asset
+		join categories c on c.id = a.id_category;`)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	defer res.Close()
+	for res.Next() {
+		var request entities.Request
+
+		err = res.Scan(&request.Id, &request.Id_user, &request.Id_asset, &request.Id_status, &request.Request_date, &request.Return_date, &request.Description, &request.User_name, &request.Asset_name, &request.Category, &request.Avail_quantity, &request.Status)
+		if err != nil {
+			fmt.Println(err)
+			return nil, err
+		}
+
+		requests = append(requests, request)
+	}
+	return requests, nil
+}
