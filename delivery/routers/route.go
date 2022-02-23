@@ -33,8 +33,8 @@ func RegisterPath(
 	e.GET("/assets", assetController.GetAssetsController())
 	e.GET("assets/summary", assetController.GetSummaryAssetsController(), middlewares.JWTMiddleware())
 	e.GET("assets/:id", assetController.GetAssetByIdController(), middlewares.JWTMiddleware())
-	e.GET("assets/history/:id", assetController.GetHistoryUsageController(), middlewares.JWTMiddleware())
 	e.PUT("assets/:id", assetController.UpdateAssetController(), middlewares.JWTMiddleware())
+	e.GET("assets/:id/usage", assetController.GetHistoryUsageController(), middlewares.JWTMiddleware())
 	e.DELETE("assets/:id", assetController.DeleteAssetController(), middlewares.JWTMiddleware())
 
 	// request
