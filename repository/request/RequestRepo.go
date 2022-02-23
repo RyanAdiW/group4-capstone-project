@@ -133,14 +133,26 @@ func (rr *requestRepo) GetAvailQty(id int) (entities.Request, error) {
 }
 
 // get requests
-func (rr *requestRepo) Get() ([]entities.Request, error) {
+func (rr *requestRepo) Get(request_date, status, filter_date string) ([]entities.Request, error) {
+	var condition string
 	var requests []entities.Request
+
+	// var bind []interface{}
+
+	if request_date == "latest" {
+		condition += "order by r.request_date desc"
+	} else if request_date == "oldest" {
+		condition += "order by r.request_date asc"
+	}
+
 	res, err := rr.db.Query(`select r.id, r.id_user, r.id_asset, r.id_status, r.request_date, r.return_date, r.description, u.name as user_name, a.name as asset_name, c.description as category, a.avail_quantity, s.description as status 
 	from requests r
 	join users u on u.id = r.id_user
 	join status_check s on s.id = r.id_status
 	join assets a on a.id = r.id_asset
-		join categories c on c.id = a.id_category;`)
+		join categories c on c.id = a.id_category
+	where id_status != 8
+	` + condition)
 	if err != nil {
 		log.Println(err)
 		return nil, err

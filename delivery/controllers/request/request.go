@@ -197,7 +197,10 @@ func (rc RequestController) UpdateRequestStatus() echo.HandlerFunc {
 // 4. get requests
 func (rc *RequestController) GetRequestsController() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		requests, err := rc.repository.Get()
+		request_date := c.QueryParam("request_date")
+		status := c.QueryParam("status")
+		filter_date := c.QueryParam("filter_date")
+		requests, err := rc.repository.Get(request_date, status, filter_date)
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to fetch data"))
 		}

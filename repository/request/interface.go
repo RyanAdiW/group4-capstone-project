@@ -6,7 +6,7 @@ import (
 
 type RequestRepo interface {
 	Create(entities.Request) error
-	Get() ([]entities.Request, error)
+	Get(request_date, status, filter_date string) ([]entities.Request, error)
 	GetById(int) (entities.Request, error)
 	Update(entities.Request, int) error
 	UpdateAvailQty(int, int) error
