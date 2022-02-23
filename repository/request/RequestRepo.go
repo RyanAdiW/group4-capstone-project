@@ -134,19 +134,20 @@ func (rr *requestRepo) GetAvailQty(id int) (entities.Request, error) {
 
 // get requests (admin)
 func (rr *requestRepo) GetAdmin(request_date, status, filter_date string) ([]entities.Request, error) {
-	var condition string
+	var condition1, condition2 string
 	var requests []entities.Request
 
 	var bind []interface{}
 
 	if request_date == "latest" {
-		condition += "order by r.request_date desc"
+		condition2 += "order by r.request_date desc"
 	} else if request_date == "oldest" {
-		condition += "order by r.request_date asc"
+		condition2 += "order by r.request_date asc"
 	}
 
 	if status != "" {
 		bind = append(bind, status)
+		condition1 += `where id_status = ? `
 
 	}
 
@@ -156,8 +157,7 @@ func (rr *requestRepo) GetAdmin(request_date, status, filter_date string) ([]ent
 	join status_check s on s.id = r.id_status
 	join assets a on a.id = r.id_asset
 		join categories c on c.id = a.id_category
-	where id_status = ?
-	`+condition, bind...)
+		`+condition1+condition2, bind...)
 	if err != nil {
 		log.Println(err)
 		return nil, err
