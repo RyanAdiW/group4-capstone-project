@@ -132,8 +132,8 @@ func (rr *requestRepo) GetAvailQty(id int) (entities.Request, error) {
 	return request, nil
 }
 
-// get requests
-func (rr *requestRepo) Get(request_date, status, filter_date string) ([]entities.Request, error) {
+// get requests (admin)
+func (rr *requestRepo) GetAdmin(request_date, status, filter_date string) ([]entities.Request, error) {
 	var condition string
 	var requests []entities.Request
 
