@@ -91,7 +91,7 @@ func (rc RequestController) GetRequestByIdController() echo.HandlerFunc {
 	}
 }
 
-// 3. update status request admin
+// 3. update status request
 func (rc RequestController) UpdateRequestStatus() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		idRole, err := middlewares.GetIdRole(c)
@@ -130,8 +130,9 @@ func (rc RequestController) UpdateRequestStatus() echo.HandlerFunc {
 			3: manager
 		*/
 
+		switch idRole {
 		// admin
-		if idRole == 1 {
+		case 1:
 			if request.Id_status != 2 {
 				if request.Id_status != 5 {
 					if request.Id_status != 6 {
@@ -141,22 +142,20 @@ func (rc RequestController) UpdateRequestStatus() echo.HandlerFunc {
 					}
 				}
 			}
-		}
-
 		// employee
-		if idRole == 2 {
+		case 2:
 			if request.Id_status != 8 {
 				return c.JSON(http.StatusUnauthorized, response.UnauthorizedRequest("unauthorized", "id_status must be 8"))
 			}
-		}
-
 		// manager
-		if idRole == 3 {
+		case 3:
 			if request.Id_status != 3 {
 				if request.Id_status != 4 {
 					return c.JSON(http.StatusUnauthorized, response.UnauthorizedRequest("unauthorized", "id_status must be 3 || 4"))
 				}
 			}
+		default:
+			return c.JSON(http.StatusUnauthorized, response.UnauthorizedRequest("unauthorized", "id_status must be 3 || 4"))
 		}
 
 		// update request based on id to database
