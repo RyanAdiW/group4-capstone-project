@@ -5,7 +5,7 @@ Final Project
 
 ### 🕮 &nbsp;OpenAPI Documentation
 
-See documentation [here](https://app.swaggerhub.com/apis-docs/RyanAdiW/Employee-Assets-Management/1.0.0-oas3).
+See documentation [here](https://app.swaggerhub.com/apis-docs/RyanAdiW/Employee-Assets-Management/1.0.0).
 
 ### 🛠 &nbsp;Built With
 
