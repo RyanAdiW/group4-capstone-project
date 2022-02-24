@@ -35,8 +35,8 @@ func (rr *requestRepo) Create(request entities.Request) error {
 }
 
 // get request by id
-func (rr *requestRepo) GetById(id int) (entities.Request, error) {
-	var request entities.Request
+func (rr *requestRepo) GetById(id int) (entities.RequestResponse, error) {
+	var request entities.RequestResponse
 	if request.Return_date != "" {
 		row := rr.db.QueryRow(`select r.id, r.id_user, r.id_asset, r.id_status, r.request_date, r.return_date, r.description, u.name as user_name, a.name as asset_name, c.description as category, a.avail_quantity, s.description as status 
 		from requests r
