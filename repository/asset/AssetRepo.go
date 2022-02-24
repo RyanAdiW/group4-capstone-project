@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"strings"
 
 	"sirclo/project/capstone/entities"
 )
@@ -39,20 +38,38 @@ func (ar *assetRepo) Create(asset entities.Asset) error {
 }
 
 // get all asset with filter
-func (ar *assetRepo) Get(category, keyword string) ([]entities.Asset, error) {
+func (ar *assetRepo) Get(category, maintenance, avail string) ([]entities.Asset, error) {
 	var condition string
 
 	var bind []interface{}
 
-	if category != "all" {
+	if category != "" {
 		bind = append(bind, category)
 		condition += " and c.id=? "
 	}
 
-	if keyword != "" {
-		bind = append(bind, "%"+strings.ToLower(keyword)+"%")
-		condition += " and a.name LIKE ? "
+	if maintenance != "" {
+		switch maintenance {
+		case "no":
+			condition += " and a.is_maintenance = false"
+		case "yes":
+			condition += " and a.is_maintenance = true"
+		}
 	}
+
+	if avail != "" {
+		switch avail {
+		case "no":
+			condition += " and a.avail_quantity = 0"
+		case "yes":
+			condition += " and a.avail_quantity > 0"
+		}
+	}
+
+	// if maintenance != "" {
+	// 	bind = append(bind, "%"+strings.ToLower(keyword)+"%")
+	// 	condition += " and a.name LIKE ? "
+	// }
 	var assets []entities.Asset
 	results, err := ar.db.Query(`select a.id, a.id_category, a.is_maintenance, a.name, a.description, a.initial_quantity, a.avail_quantity, a.photo, c.description as category
 								from assets a
