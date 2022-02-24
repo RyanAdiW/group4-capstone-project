@@ -39,6 +39,7 @@ func RegisterPath(
 
 	// request
 	e.POST("/requests", requestController.CreateRequestEmployee(), middlewares.JWTMiddleware())
+	e.GET("/requests", requestController.GetRequestsController(), middlewares.JWTMiddleware())
 	e.GET("requests/:id", requestController.GetRequestByIdController(), middlewares.JWTMiddleware())
 	e.PUT("requests/:id", requestController.UpdateRequestStatus(), middlewares.JWTMiddleware())
 }
