@@ -147,8 +147,12 @@ func (rr *requestRepo) GetAdmin(request_date, status, filter_date string) ([]ent
 
 	if status != "" {
 		bind = append(bind, status)
-		condition1 += `where id_status = ? `
+		condition1 += "and r.id_status = ? "
+	}
 
+	if filter_date != "" {
+		bind = append(bind, "%"+filter_date+"%")
+		condition1 += "and r.request_date LIKE ? "
 	}
 
 	res, err := rr.db.Query(`select r.id, r.id_user, r.id_asset, r.id_status, r.request_date, r.return_date, r.description, u.name as user_name, a.name as asset_name, c.description as category, a.avail_quantity, s.description as status 
@@ -157,7 +161,7 @@ func (rr *requestRepo) GetAdmin(request_date, status, filter_date string) ([]ent
 	join status_check s on s.id = r.id_status
 	join assets a on a.id = r.id_asset
 		join categories c on c.id = a.id_category
-		`+condition1+condition2, bind...)
+	where id_status != 8	`+condition1+condition2, bind...)
 	if err != nil {
 		log.Println(err)
 		return nil, err
