@@ -133,9 +133,9 @@ func (rr *requestRepo) GetAvailQty(id int) (entities.Request, error) {
 }
 
 // get requests (admin)
-func (rr *requestRepo) GetAdmin(request_date, status, filter_date string) ([]entities.Request, error) {
+func (rr *requestRepo) GetAdmin(request_date, status, filter_date string) ([]entities.RequestResponse, error) {
 	var condition1, condition2 string
-	var requests []entities.Request
+	var requests []entities.RequestResponse
 
 	var bind []interface{}
 
@@ -169,7 +169,7 @@ func (rr *requestRepo) GetAdmin(request_date, status, filter_date string) ([]ent
 
 	defer res.Close()
 	for res.Next() {
-		var request entities.Request
+		var request entities.RequestResponse
 
 		err = res.Scan(&request.Id, &request.Id_user, &request.Id_asset, &request.Id_status, &request.Request_date, &request.Return_date, &request.Description, &request.User_name, &request.Asset_name, &request.Category, &request.Avail_quantity, &request.Status)
 		if err != nil {
