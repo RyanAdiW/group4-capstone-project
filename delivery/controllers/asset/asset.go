@@ -101,8 +101,9 @@ func (ac AssetController) CreateAssetController() echo.HandlerFunc {
 func (ac AssetController) GetAssetsController() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		category := c.QueryParam("category")
-		keyword := c.QueryParam("keyword")
-		assets, err := ac.repository.Get(category, keyword)
+		maintenance := c.QueryParam("maintenance")
+		avail := c.QueryParam("avail")
+		assets, err := ac.repository.Get(category, maintenance, avail)
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to fetch data"))
 		}
