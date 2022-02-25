@@ -23,19 +23,18 @@ func RegisterPath(
 
 	// user
 	e.POST("/users", userController.CreateUserController())
-	e.GET("/users", userController.GetUsersController())
+	// e.GET("/users", userController.GetUsersController())
 	e.GET("/users/:id", userController.GetByIdController())
-	e.PUT("/users/:id", userController.UpdateUserController(), middlewares.JWTMiddleware())
-	e.DELETE("/users/:id", userController.DeleteUserController(), middlewares.JWTMiddleware())
+	// e.PUT("/users/:id", userController.UpdateUserController(), middlewares.JWTMiddleware())
+	// e.DELETE("/users/:id", userController.DeleteUserController(), middlewares.JWTMiddleware())
 
 	// asset
-	e.POST("/assets", assetController.CreateAssetController(), middlewares.JWTMiddleware())
 	e.GET("/assets", assetController.GetAssetsController())
+	e.POST("/assets/add", assetController.CreateAssetController(), middlewares.JWTMiddleware())
 	e.GET("assets/summary", assetController.GetSummaryAssetsController(), middlewares.JWTMiddleware())
-	e.GET("assets/:id", assetController.GetAssetByIdController(), middlewares.JWTMiddleware())
-	e.PUT("assets/:id", assetController.UpdateAssetController(), middlewares.JWTMiddleware())
-	e.GET("assets/:id/usage", assetController.GetHistoryUsageController(), middlewares.JWTMiddleware())
-	e.DELETE("assets/:id", assetController.DeleteAssetController(), middlewares.JWTMiddleware())
+	e.GET("assets/detail/:id", assetController.GetAssetByIdController(), middlewares.JWTMiddleware())
+	e.PUT("assets/update/:id", assetController.UpdateAssetController(), middlewares.JWTMiddleware())
+	e.GET("assets/usage/:id", assetController.GetHistoryUsageController(), middlewares.JWTMiddleware())
 
 	// request
 	e.POST("/requests", requestController.CreateRequestEmployee(), middlewares.JWTMiddleware())
