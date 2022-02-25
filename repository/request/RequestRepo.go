@@ -184,25 +184,35 @@ func (rr *requestRepo) GetAdmin(request_date, status, filter_date string) ([]ent
 
 // get requests (manager)
 func (rr *requestRepo) GetManager(request_date, status, filter_date string) ([]entities.RequestResponse, error) {
-	var condition1, condition2 string
+	var condition string
 	var requests []entities.RequestResponse
 
 	var bind []interface{}
 
-	if request_date == "latest" {
-		condition2 += "order by r.request_date desc"
-	} else if request_date == "oldest" {
-		condition2 += "order by r.request_date asc"
-	}
-
 	if status != "" {
-		bind = append(bind, status)
-		condition1 += "and r.id_status = ? "
+		switch status {
+		case "new":
+			condition += "and r.id_status = 2 "
+		case "using":
+			condition += "and r.id_status = 6 "
+		case "reject":
+			condition += "and r.id_status = 4 "
+		case "returned":
+			condition += "and r.id_status = 8 "
+		default:
+			condition += ""
+		}
 	}
 
 	if filter_date != "" {
 		bind = append(bind, "%"+filter_date+"%")
-		condition1 += "and r.request_date LIKE ? "
+		condition += "and r.request_date LIKE ? "
+	}
+
+	if request_date == "latest" {
+		condition += "order by r.request_date desc "
+	} else if request_date == "oldest" {
+		condition += "order by r.request_date asc "
 	}
 
 	res, err := rr.db.Query(`select r.id, r.id_user, r.id_asset, r.id_status, r.request_date, r.return_date, r.description, u.name as user_name, a.name as asset_name, c.description as category, a.avail_quantity, s.description as status 
@@ -211,7 +221,7 @@ func (rr *requestRepo) GetManager(request_date, status, filter_date string) ([]e
 	join status_check s on s.id = r.id_status
 	join assets a on a.id = r.id_asset
 		join categories c on c.id = a.id_category
-	where id_status != 0 and id_status != 1 and id_status != 5 and id_status != 7 and id_status != 8	`+condition1+condition2, bind...)
+	where id_status != 0 and id_status != 1 and id_status != 5 and id_status != 7	`+condition, bind...)
 	if err != nil {
 		log.Println(err)
 		return nil, err
