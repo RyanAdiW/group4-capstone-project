@@ -161,7 +161,57 @@ func (rr *requestRepo) GetAdmin(request_date, status, filter_date string) ([]ent
 	join status_check s on s.id = r.id_status
 	join assets a on a.id = r.id_asset
 		join categories c on c.id = a.id_category
-	where id_status != 8	`+condition1+condition2, bind...)
+	where id_status != 0	`+condition1+condition2, bind...)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	defer res.Close()
+	for res.Next() {
+		var request entities.RequestResponse
+
+		err = res.Scan(&request.Id, &request.Id_user, &request.Id_asset, &request.Id_status, &request.Request_date, &request.Return_date, &request.Description, &request.User_name, &request.Asset_name, &request.Category, &request.Avail_quantity, &request.Status)
+		if err != nil {
+			fmt.Println(err)
+			return nil, err
+		}
+
+		requests = append(requests, request)
+	}
+	return requests, nil
+}
+
+// get requests (manager)
+func (rr *requestRepo) GetManager(request_date, status, filter_date string) ([]entities.RequestResponse, error) {
+	var condition1, condition2 string
+	var requests []entities.RequestResponse
+
+	var bind []interface{}
+
+	if request_date == "latest" {
+		condition2 += "order by r.request_date desc"
+	} else if request_date == "oldest" {
+		condition2 += "order by r.request_date asc"
+	}
+
+	if status != "" {
+		bind = append(bind, status)
+		condition1 += "and r.id_status = ? "
+	}
+
+	if filter_date != "" {
+		bind = append(bind, "%"+filter_date+"%")
+		condition1 += "and r.request_date LIKE ? "
+	}
+
+	res, err := rr.db.Query(`select r.id, r.id_user, r.id_asset, r.id_status, r.request_date, r.return_date, r.description, u.name as user_name, a.name as asset_name, c.description as category, a.avail_quantity, s.description as status 
+	from requests r
+	join users u on u.id = r.id_user
+	join status_check s on s.id = r.id_status
+	join assets a on a.id = r.id_asset
+		join categories c on c.id = a.id_category
+	where id_status != 0 and id_status != 1 and id_status != 5 and id_status != 7 and id_status != 8	`+condition1+condition2, bind...)
 	if err != nil {
 		log.Println(err)
 		return nil, err
