@@ -196,10 +196,23 @@ func (rc RequestController) UpdateRequestStatus() echo.HandlerFunc {
 // 4. get requests
 func (rc *RequestController) GetRequestsController() echo.HandlerFunc {
 	return func(c echo.Context) error {
+		idRole, err := middlewares.GetIdRole(c)
+		if err != nil {
+			return c.JSON(http.StatusUnauthorized, response.UnauthorizedRequest("unauthorized", "unauthorized access"))
+		}
+
 		request_date := c.QueryParam("request_date")
 		status := c.QueryParam("status")
 		filter_date := c.QueryParam("filter_date")
-		requests, err := rc.repository.GetAdmin(request_date, status, filter_date)
+
+		var requests []entities.RequestResponse
+		switch idRole {
+		case 1:
+			requests, err = rc.repository.GetAdmin(request_date, status, filter_date)
+		case 3:
+			requests, err = rc.repository.GetManager(request_date, status, filter_date)
+		}
+
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to fetch data"))
 		}
