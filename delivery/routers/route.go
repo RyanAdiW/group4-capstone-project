@@ -41,4 +41,9 @@ func RegisterPath(
 	e.GET("/requests", requestController.GetRequestsController(), middlewares.JWTMiddleware())
 	e.GET("requests/:id", requestController.GetRequestByIdController(), middlewares.JWTMiddleware())
 	e.PUT("requests/:id", requestController.UpdateRequestStatus(), middlewares.JWTMiddleware())
+
+	// employee
+	e.GET("employee/activity", requestController.GetRequestActivityController(), middlewares.JWTMiddleware())
+	e.GET("employee/history", requestController.GetRequestHistoryController(), middlewares.JWTMiddleware())
+	e.GET("employee/request_loan/:id", requestController.GetRequestByIdController(), middlewares.JWTMiddleware())
 }

@@ -48,12 +48,13 @@ func (ac AuthController) LoginEmailController() echo.HandlerFunc {
 
 		uid, _ := ac.repository.GetIdByEmail(loginRequest.Email)
 		idRole, _ := ac.repository.GetIdRole(loginRequest.Email)
+		name, _ := ac.repository.GetNameByEmail(loginRequest.Email)
 
 		data := LoginResponseFormat{
-			Token:         token,
-			Id_user:       uid,
-			Id_role:       idRole,
-			Current_email: loginRequest.Email,
+			Token:   token,
+			Id_user: uid,
+			Id_role: idRole,
+			Name:    name,
 		}
 		return c.JSON(http.StatusOK, common.SuccessOperation("success", "login success", data))
 	}

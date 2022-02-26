@@ -12,4 +12,5 @@ type RequestRepo interface {
 	Update(entities.Request, int) error
 	UpdateAvailQty(int, int) error
 	GetAvailQty(int) (entities.Request, error)
+	GetEmployee(id_employee int, is_history bool) ([]entities.RequestResponse, error)
 }

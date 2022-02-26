@@ -219,3 +219,35 @@ func (rc *RequestController) GetRequestsController() echo.HandlerFunc {
 		return c.JSON(http.StatusOK, response.SuccessOperation("success", "success get all request", requests))
 	}
 }
+
+// get request activity users
+func (rc RequestController) GetRequestActivityController() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		iduser, err := middlewares.GetId(c)
+		if err != nil {
+			return c.JSON(http.StatusUnauthorized, response.UnauthorizedRequest("unauthorized", "unauthorized access"))
+		}
+
+		request, err := rc.repository.GetEmployee(iduser, false)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to fetch data"))
+		}
+		return c.JSON(http.StatusOK, response.SuccessOperation("success", "success get activity", request))
+	}
+}
+
+// get request history users
+func (rc RequestController) GetRequestHistoryController() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		iduser, err := middlewares.GetId(c)
+		if err != nil {
+			return c.JSON(http.StatusUnauthorized, response.UnauthorizedRequest("unauthorized", "unauthorized access"))
+		}
+
+		request, err := rc.repository.GetEmployee(iduser, true)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to fetch data"))
+		}
+		return c.JSON(http.StatusOK, response.SuccessOperation("success", "success get history user", request))
+	}
+}
