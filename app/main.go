@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"sirclo/project/capstone/config"
 	_route "sirclo/project/capstone/delivery/routers"
@@ -26,6 +27,7 @@ func main() {
 
 	// load config
 	config := config.GetConfig()
+	fmt.Println(config)
 	// initialize database connection
 	db := util.MysqlDriver(config)
 	defer db.Close()
