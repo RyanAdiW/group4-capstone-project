@@ -204,19 +204,47 @@ func (rc *RequestController) GetRequestsController() echo.HandlerFunc {
 		request_date := c.QueryParam("request_date")
 		status := c.QueryParam("status")
 		filter_date := c.QueryParam("filter_date")
+		limitstr := c.QueryParam("limit")
+		offsetstr := c.QueryParam("offset")
 
-		var requests []entities.RequestResponse
-		switch idRole {
-		case 1:
-			requests, err = rc.repository.GetAdmin(request_date, status, filter_date)
-		case 3:
-			requests, err = rc.repository.GetManager(request_date, status, filter_date)
+		limit, err := strconv.Atoi(limitstr)
+		if err != nil {
+			limit = 0
 		}
 
+		offset, err := strconv.Atoi(offsetstr)
+		if err != nil {
+			offset = 0
+		}
+
+		var requests []entities.RequestResponse
+		total_page := 0
+		switch idRole {
+		case 1:
+			requests, err = rc.repository.GetAdmin(request_date, status, filter_date, limit, offset)
+			if limit > 0 {
+				requeststotpage, _ := rc.repository.GetAdmin(request_date, status, filter_date, 0, 0)
+				total_page = (len(requeststotpage) / limit) + 1
+			}
+		case 3:
+			requests, err = rc.repository.GetManager(request_date, status, filter_date, limit, offset)
+			if limit > 0 {
+				requeststotpage, _ := rc.repository.GetManager(request_date, status, filter_date, 0, 0)
+
+				if len(requeststotpage)%limit == 0 {
+					total_page = (len(requeststotpage) / limit)
+				} else {
+					total_page = (len(requeststotpage) / limit) + 1
+				}
+			}
+		}
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to fetch data"))
 		}
-		return c.JSON(http.StatusOK, response.SuccessOperation("success", "success get all request", requests))
+		return c.JSON(http.StatusOK, response.SuccessOperation("success", "success get all request", map[string]interface{}{
+			"total_page": total_page,
+			"data":       requests,
+		}))
 	}
 }
 
@@ -228,11 +256,38 @@ func (rc RequestController) GetRequestActivityController() echo.HandlerFunc {
 			return c.JSON(http.StatusUnauthorized, response.UnauthorizedRequest("unauthorized", "unauthorized access"))
 		}
 
-		request, err := rc.repository.GetEmployee(iduser, false)
+		limitstr := c.QueryParam("limit")
+		offsetstr := c.QueryParam("offset")
+
+		limit, err := strconv.Atoi(limitstr)
+		if err != nil {
+			limit = 0
+		}
+
+		offset, err := strconv.Atoi(offsetstr)
+		if err != nil {
+			offset = 0
+		}
+
+		request, err := rc.repository.GetEmployee(iduser, false, limit, offset)
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to fetch data"))
 		}
-		return c.JSON(http.StatusOK, response.SuccessOperation("success", "success get activity", request))
+
+		total_page := 0
+		if limit > 0 {
+			requeststotpage, _ := rc.repository.GetEmployee(iduser, false, 0, 0)
+
+			if len(requeststotpage)%limit == 0 {
+				total_page = (len(requeststotpage) / limit)
+			} else {
+				total_page = (len(requeststotpage) / limit) + 1
+			}
+		}
+		return c.JSON(http.StatusOK, response.SuccessOperation("success", "success get all assets", map[string]interface{}{
+			"total_page": total_page,
+			"data":       request,
+		}))
 	}
 }
 
@@ -244,10 +299,37 @@ func (rc RequestController) GetRequestHistoryController() echo.HandlerFunc {
 			return c.JSON(http.StatusUnauthorized, response.UnauthorizedRequest("unauthorized", "unauthorized access"))
 		}
 
-		request, err := rc.repository.GetEmployee(iduser, true)
+		limitstr := c.QueryParam("limit")
+		offsetstr := c.QueryParam("offset")
+
+		limit, err := strconv.Atoi(limitstr)
+		if err != nil {
+			limit = 0
+		}
+
+		offset, err := strconv.Atoi(offsetstr)
+		if err != nil {
+			offset = 0
+		}
+
+		request, err := rc.repository.GetEmployee(iduser, true, limit, offset)
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to fetch data"))
 		}
-		return c.JSON(http.StatusOK, response.SuccessOperation("success", "success get history user", request))
+
+		total_page := 0
+		if limit > 0 {
+			requeststotpage, _ := rc.repository.GetEmployee(iduser, true, 0, 0)
+
+			if len(requeststotpage)%limit == 0 {
+				total_page = (len(requeststotpage) / limit)
+			} else {
+				total_page = (len(requeststotpage) / limit) + 1
+			}
+		}
+		return c.JSON(http.StatusOK, response.SuccessOperation("success", "success get all assets", map[string]interface{}{
+			"total_page": total_page,
+			"data":       request,
+		}))
 	}
 }

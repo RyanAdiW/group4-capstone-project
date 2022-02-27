@@ -133,8 +133,9 @@ func (rr *requestRepo) GetAvailQty(id int) (entities.Request, error) {
 }
 
 // get requests (admin)
-func (rr *requestRepo) GetAdmin(request_date, status, filter_date string) ([]entities.RequestResponse, error) {
+func (rr *requestRepo) GetAdmin(request_date, status, filter_date string, limit, offset int) ([]entities.RequestResponse, error) {
 	var condition string
+	var cond_limit string
 	var requests []entities.RequestResponse
 
 	var bind []interface{}
@@ -165,13 +166,24 @@ func (rr *requestRepo) GetAdmin(request_date, status, filter_date string) ([]ent
 		condition += "order by r.request_date asc "
 	}
 
+	if limit != 0 && offset == 0 {
+		bind = append(bind, limit)
+		cond_limit += "limit ?"
+	}
+
+	if limit != 0 && offset != 0 {
+		bind = append(bind, offset)
+		bind = append(bind, limit)
+		cond_limit += "limit ?, ?"
+	}
+
 	res, err := rr.db.Query(`select r.id, r.id_user, r.id_asset, r.id_status, r.request_date, r.return_date, r.description, u.name as user_name, a.name as asset_name, c.description as category, a.avail_quantity, s.description as status 
 	from requests r
 	join users u on u.id = r.id_user
 	join status_check s on s.id = r.id_status
 	join assets a on a.id = r.id_asset
 		join categories c on c.id = a.id_category
-	where id_status != 0	`+condition, bind...)
+	where id_status != 0	`+condition+cond_limit, bind...)
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -193,9 +205,10 @@ func (rr *requestRepo) GetAdmin(request_date, status, filter_date string) ([]ent
 }
 
 // get requests (manager)
-func (rr *requestRepo) GetManager(request_date, status, filter_date string) ([]entities.RequestResponse, error) {
+func (rr *requestRepo) GetManager(request_date, status, filter_date string, limit, offset int) ([]entities.RequestResponse, error) {
 	var condition string
 	var requests []entities.RequestResponse
+	var cond_limit string
 
 	var bind []interface{}
 
@@ -225,13 +238,24 @@ func (rr *requestRepo) GetManager(request_date, status, filter_date string) ([]e
 		condition += "order by r.request_date asc "
 	}
 
+	if limit != 0 && offset == 0 {
+		bind = append(bind, limit)
+		cond_limit += "limit ?"
+	}
+
+	if limit != 0 && offset != 0 {
+		bind = append(bind, offset)
+		bind = append(bind, limit)
+		cond_limit += "limit ?, ?"
+	}
+
 	res, err := rr.db.Query(`select r.id, r.id_user, r.id_asset, r.id_status, r.request_date, r.return_date, r.description, u.name as user_name, a.name as asset_name, c.description as category, a.avail_quantity, s.description as status 
 	from requests r
 	join users u on u.id = r.id_user
 	join status_check s on s.id = r.id_status
 	join assets a on a.id = r.id_asset
 		join categories c on c.id = a.id_category
-	where id_status != 0 and id_status != 1 and id_status != 5 and id_status != 7	`+condition, bind...)
+	where id_status != 0 and id_status != 1 and id_status != 5 and id_status != 7	`+condition+cond_limit, bind...)
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -252,8 +276,9 @@ func (rr *requestRepo) GetManager(request_date, status, filter_date string) ([]e
 	return requests, nil
 }
 
-func (rr *requestRepo) GetEmployee(id_employee int, is_history bool) ([]entities.RequestResponse, error) {
+func (rr *requestRepo) GetEmployee(id_employee int, is_history bool, limit, offset int) ([]entities.RequestResponse, error) {
 	var condition string
+	var cond_limit string
 	var requests []entities.RequestResponse
 
 	var bind []interface{}
@@ -264,13 +289,24 @@ func (rr *requestRepo) GetEmployee(id_employee int, is_history bool) ([]entities
 
 	condition += "order by r.request_date desc "
 
+	if limit != 0 && offset == 0 {
+		bind = append(bind, limit)
+		cond_limit += "limit ?"
+	}
+
+	if limit != 0 && offset != 0 {
+		bind = append(bind, offset)
+		bind = append(bind, limit)
+		cond_limit += "limit ?, ?"
+	}
+
 	res, err := rr.db.Query(`select r.id, r.id_user, r.id_asset, r.id_status, r.request_date, r.return_date, r.description, u.name as user_name, a.name as asset_name, c.description as category, a.avail_quantity, s.description as status 
 	from requests r
 	join users u on u.id = r.id_user
 	join status_check s on s.id = r.id_status
 	join assets a on a.id = r.id_asset
 		join categories c on c.id = a.id_category
-	where r.id_user = ? `+condition, bind...)
+	where r.id_user = ? `+condition+cond_limit, bind...)
 	if err != nil {
 		log.Println(err)
 		return nil, err
