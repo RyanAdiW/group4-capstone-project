@@ -24,6 +24,7 @@ func RegisterPath(
 	// user
 	e.POST("/users", userController.CreateUserController())
 	e.GET("/users/:id", userController.GetByIdController())
+	e.GET("/users", userController.GetUsersController())
 
 	// asset
 	e.GET("/assets", assetController.GetAssetsController())
@@ -32,6 +33,7 @@ func RegisterPath(
 	e.GET("assets/detail/:id", assetController.GetAssetByIdController(), middlewares.JWTMiddleware())
 	e.PUT("assets/update/:id", assetController.UpdateAssetController(), middlewares.JWTMiddleware())
 	e.GET("assets/usage/:id", assetController.GetHistoryUsageController(), middlewares.JWTMiddleware())
+	e.GET("/assets/categories", assetController.GetCategoriesController())
 
 	// request
 	e.POST("/requests", requestController.CreateRequestEmployee(), middlewares.JWTMiddleware())

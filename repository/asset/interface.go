@@ -10,4 +10,5 @@ type AssetRepo interface {
 	Delete(int) error
 	GetSummaryAsset() (entities.SummaryAsset, error)
 	GetHistoryUsage(int, int, int) (entities.HistoryUsage, error)
+	GetCategory() ([]entities.Categories, error)
 }
