@@ -103,11 +103,38 @@ func (ac AssetController) GetAssetsController() echo.HandlerFunc {
 		category := c.QueryParam("category")
 		maintenance := c.QueryParam("maintenance")
 		avail := c.QueryParam("avail")
-		assets, err := ac.repository.Get(category, maintenance, avail)
+
+		limitstr := c.QueryParam("limit")
+		offsetstr := c.QueryParam("offset")
+
+		limit, err := strconv.Atoi(limitstr)
+		if err != nil {
+			limit = 0
+		}
+
+		offset, err := strconv.Atoi(offsetstr)
+		if err != nil {
+			offset = 0
+		}
+
+		assets, err := ac.repository.Get(category, maintenance, avail, limit, offset)
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to fetch data"))
 		}
-		return c.JSON(http.StatusOK, response.SuccessOperation("success", "success get all assets", assets))
+
+		total_page := 0
+		if limit > 0 {
+			assetsfortotpage, _ := ac.repository.Get(category, maintenance, avail, 0, 0)
+			if len(assetsfortotpage)%limit == 0 {
+				total_page = (len(assetsfortotpage) / limit)
+			} else {
+				total_page = (len(assetsfortotpage) / limit) + 1
+			}
+		}
+		return c.JSON(http.StatusOK, response.SuccessOperation("success", "success get all assets", map[string]interface{}{
+			"total_page": total_page,
+			"data":       assets,
+		}))
 	}
 }
 
@@ -277,7 +304,20 @@ func (ac AssetController) GetHistoryUsageController() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to convert id"))
 		}
 
-		history, err := ac.repository.GetHistoryUsage(id_asset)
+		limitstr := c.QueryParam("limit")
+		offsetstr := c.QueryParam("offset")
+
+		limit, err := strconv.Atoi(limitstr)
+		if err != nil {
+			limit = 0
+		}
+
+		offset, err := strconv.Atoi(offsetstr)
+		if err != nil {
+			offset = 0
+		}
+
+		history, err := ac.repository.GetHistoryUsage(id_asset, limit, offset)
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to fetch data"))
 		}

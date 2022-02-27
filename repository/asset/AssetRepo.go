@@ -38,8 +38,9 @@ func (ar *assetRepo) Create(asset entities.Asset) error {
 }
 
 // get all asset with filter
-func (ar *assetRepo) Get(category, maintenance, avail string) ([]entities.Asset, error) {
+func (ar *assetRepo) Get(category, maintenance, avail string, limit, offset int) ([]entities.Asset, error) {
 	var condition string
+	var cond_limit string
 
 	var bind []interface{}
 
@@ -66,15 +67,22 @@ func (ar *assetRepo) Get(category, maintenance, avail string) ([]entities.Asset,
 		}
 	}
 
-	// if maintenance != "" {
-	// 	bind = append(bind, "%"+strings.ToLower(keyword)+"%")
-	// 	condition += " and a.name LIKE ? "
-	// }
+	if limit != 0 && offset == 0 {
+		bind = append(bind, limit)
+		cond_limit += "limit ?"
+	}
+
+	if limit != 0 && offset != 0 {
+		bind = append(bind, offset)
+		bind = append(bind, limit)
+		cond_limit += "limit ?, ?"
+	}
+
 	var assets []entities.Asset
 	results, err := ar.db.Query(`select a.id, a.id_category, a.is_maintenance, a.name, a.description, a.initial_quantity, a.avail_quantity, a.photo, c.description as category
 								from assets a
 								join categories c on c.id = a.id_category
-								where a.deleted_at is null`+condition+` order by a.id asc`, bind...)
+								where a.deleted_at is null`+condition+` order by a.id asc `+cond_limit, bind...)
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -207,7 +215,22 @@ func (ar *assetRepo) GetSummaryAsset() (entities.SummaryAsset, error) {
 	return summary, nil
 }
 
-func (ar *assetRepo) GetHistoryUsage(id_asset int) (entities.HistoryUsage, error) {
+func (ar *assetRepo) GetHistoryUsage(id_asset, limit, offset int) (entities.HistoryUsage, error) {
+	var cond_limit string
+	var bind []interface{}
+
+	bind = append(bind, id_asset)
+	if limit != 0 && offset == 0 {
+		bind = append(bind, limit)
+		cond_limit += "limit ?"
+	}
+
+	if limit != 0 && offset != 0 {
+		bind = append(bind, offset)
+		bind = append(bind, limit)
+		cond_limit += "limit ?, ?"
+	}
+
 	var historyUsage entities.HistoryUsage
 	results, err := ar.db.Query(`select a.id, a.id_category, a.name as asset_name, a.description, a.photo, c.description as category,
 									r.id, r.id_user, r.id_asset, u.name as user_name, r.request_date, s.description as status
@@ -216,7 +239,7 @@ func (ar *assetRepo) GetHistoryUsage(id_asset int) (entities.HistoryUsage, error
 								left join requests r on r.id_asset = a.id and r.deleted_at is null
 								join users u on u.id = r.id_user
 								join status_check s on s.id = r.id_status
-								WHERE a.id = ?`, id_asset)
+								WHERE a.id = ? `+cond_limit, bind...)
 	if err != nil {
 		log.Println(err)
 		return historyUsage, err
