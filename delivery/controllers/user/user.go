@@ -9,7 +9,6 @@ import (
 	"sirclo/project/capstone/entities"
 
 	response "sirclo/project/capstone/delivery/common"
-	middlewares "sirclo/project/capstone/delivery/middleware"
 	userRepo "sirclo/project/capstone/repository/user"
 
 	"github.com/labstack/echo/v4"
@@ -72,18 +71,7 @@ func (uc UserController) CreateUserController() echo.HandlerFunc {
 	}
 }
 
-// 2. get all user controller
-func (uc UserController) GetUsersController() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		users, err := uc.repository.Get()
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to fetch data"))
-		}
-		return c.JSON(http.StatusOK, response.SuccessOperation("success", "success get all user", users))
-	}
-}
-
-// 3. get user by id
+// 2. get user by id
 func (uc UserController) GetByIdController() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		// get id from param
@@ -99,78 +87,5 @@ func (uc UserController) GetByIdController() echo.HandlerFunc {
 		}
 
 		return c.JSON(http.StatusOK, response.SuccessOperation("success", "success get user", user))
-	}
-}
-
-// 4. update user
-func (uc UserController) UpdateUserController() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		_, err := middlewares.GetEmail(c)
-
-		if err != nil {
-			return c.JSON(http.StatusUnauthorized, response.UnauthorizedRequest("unauthorized", "unauthorized access"))
-		}
-
-		// get id from param
-		userId, errConv := strconv.Atoi(c.Param("id"))
-		if errConv != nil {
-			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to convert id"))
-		}
-		tokenId, _ := middlewares.GetId(c)
-		if userId != tokenId {
-			return c.JSON(http.StatusUnauthorized, response.UnauthorizedRequest("unauthorized", "unauthorized access"))
-		}
-
-		// binding data
-		user := entities.User{}
-		if errBind := c.Bind(&user); errBind != nil {
-			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to bind data"))
-		}
-		password := []byte(user.Password)
-
-		hashedPassword, errEncrypt := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
-		if errEncrypt != nil {
-			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to encrpyt password"))
-		}
-
-		user.Password = string(hashedPassword)
-		// update user based on id to database
-		errUpdate := uc.repository.Update(user, userId)
-		if errUpdate != nil {
-			fmt.Println(errUpdate)
-			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "data not found"))
-		}
-
-		return c.JSON(http.StatusOK, response.SuccessOperationDefault("success", "success update user"))
-	}
-}
-
-// 5. delete user
-func (uc UserController) DeleteUserController() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		_, err := middlewares.GetEmail(c)
-
-		if err != nil {
-			return c.JSON(http.StatusUnauthorized, response.UnauthorizedRequest("unauthorized", "unauthorized access"))
-		}
-
-		// get id from param
-		userId, errConv := strconv.Atoi(c.Param("id"))
-		if errConv != nil {
-			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to convert id"))
-		}
-
-		tokenId, _ := middlewares.GetId(c)
-		if userId != tokenId {
-			return c.JSON(http.StatusUnauthorized, response.UnauthorizedRequest("unauthorized", "unauthorized access"))
-		}
-
-		// delete user based on id from database
-		errDelete := uc.repository.Delete(userId)
-		if errDelete != nil {
-			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "data not found"))
-		}
-
-		return c.JSON(http.StatusOK, response.SuccessOperationDefault("success", "delete success"))
 	}
 }
