@@ -263,3 +263,28 @@ func (ar *assetRepo) GetHistoryUsage(id_asset, limit, offset int) (entities.Hist
 
 	return historyUsage, nil
 }
+
+func (ar *assetRepo) GetCategory() ([]entities.Categories, error) {
+	var categories []entities.Categories
+	row, err := ar.db.Query(`select id, description
+						from categories
+						where deleted_at is null`)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for row.Next() {
+		var category entities.Categories
+
+		err = row.Scan(&category.Id, &category.Description)
+		if err != nil {
+			log.Println(err)
+			return nil, err
+		}
+
+		categories = append(categories, category)
+	}
+
+	return categories, nil
+}

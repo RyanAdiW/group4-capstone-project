@@ -37,3 +37,8 @@ type History struct {
 	Request_date string `json:"request_date" form:"request_date"`
 	Status       string `json:"status" form:"status"`
 }
+
+type Categories struct {
+	Id          int    `json:"id" form:"id"`
+	Description string `json:"description" form:"description"`
+}

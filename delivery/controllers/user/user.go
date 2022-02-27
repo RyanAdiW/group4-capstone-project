@@ -89,3 +89,14 @@ func (uc UserController) GetByIdController() echo.HandlerFunc {
 		return c.JSON(http.StatusOK, response.SuccessOperation("success", "success get user", user))
 	}
 }
+
+// 3. get all user controller
+func (uc UserController) GetUsersController() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		users, err := uc.repository.Get()
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to fetch data"))
+		}
+		return c.JSON(http.StatusOK, response.SuccessOperation("success", "success get all user", users))
+	}
+}

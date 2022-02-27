@@ -324,3 +324,13 @@ func (ac AssetController) GetHistoryUsageController() echo.HandlerFunc {
 		return c.JSON(http.StatusOK, response.SuccessOperation("success", "success get history", history))
 	}
 }
+
+func (ac AssetController) GetCategoriesController() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		categories, err := ac.repository.GetCategory()
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to fetch data"))
+		}
+		return c.JSON(http.StatusOK, response.SuccessOperation("success", "success get categories", categories))
+	}
+}
