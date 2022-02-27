@@ -188,7 +188,7 @@ func (ar *assetRepo) Delete(id int) error {
 
 func (ar *assetRepo) GetSummaryAsset() (entities.SummaryAsset, error) {
 	var summary entities.SummaryAsset
-	row := ar.db.QueryRow(`select all_asset.total_asset, all_asset.total_avail_asset, maintenance.total_asset_maintenance
+	row := ar.db.QueryRow(`select all_asset.total_asset, all_asset.total_avail_asset, COALESCE(maintenance.total_asset_maintenance, 0)
 							from (
 								SELECT 
 									sum(a.initial_quantity) as total_asset, sum(a.avail_quantity) as total_avail_asset
