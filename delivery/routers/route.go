@@ -23,10 +23,7 @@ func RegisterPath(
 
 	// user
 	e.POST("/users", userController.CreateUserController())
-	// e.GET("/users", userController.GetUsersController())
 	e.GET("/users/:id", userController.GetByIdController())
-	// e.PUT("/users/:id", userController.UpdateUserController(), middlewares.JWTMiddleware())
-	// e.DELETE("/users/:id", userController.DeleteUserController(), middlewares.JWTMiddleware())
 
 	// asset
 	e.GET("/assets", assetController.GetAssetsController())
