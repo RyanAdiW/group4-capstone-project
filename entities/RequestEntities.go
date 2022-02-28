@@ -29,4 +29,5 @@ type RequestResponse struct {
 	Category       string `json:"category" form:"category"`
 	Avail_quantity int    `json:"avail_quantity" form:"avail_quantity"`
 	Status         string `json:"status" form:"status"`
+	Photo          string `json:"photo" form:"photo"`
 }
