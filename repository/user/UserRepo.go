@@ -43,7 +43,7 @@ func (ur *userRepo) Get() ([]entities.User, error) {
 	results, err := ur.db.Query(`select u.id, u.name, u.email, u.divisi, r.id as id_role, r.description as role
 								from users u
 								join roles r on r.id=u.id_role
-								where u.deleted_at is null order by u.id asc`)
+								where u.deleted_at is null and u.id_role = 2 order by u.id asc`)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
