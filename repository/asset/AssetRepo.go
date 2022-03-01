@@ -274,6 +274,8 @@ func (ar *assetRepo) GetCategory() ([]entities.Categories, error) {
 		return nil, err
 	}
 
+	defer row.Close()
+
 	for row.Next() {
 		var category entities.Categories
 
