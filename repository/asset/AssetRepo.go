@@ -49,14 +49,14 @@ func (ar *assetRepo) Get(category, maintenance, avail string, limit, offset int)
 		condition += " and c.id=? "
 	}
 
-	if maintenance != "" {
-		switch maintenance {
-		case "no":
-			condition += " and a.is_maintenance = false"
-		case "yes":
-			condition += " and a.is_maintenance = true"
-		}
-	}
+	// if maintenance != "" {
+	// 	switch maintenance {
+	// 	case "no":
+	// 		condition += " and a.is_maintenance = false"
+	// 	case "yes":
+	// 		condition += " and a.is_maintenance = true"
+	// 	}
+	// }
 
 	if avail != "" {
 		switch avail {
@@ -150,6 +150,7 @@ func (ar *assetRepo) Update(assetExisted, asset entities.Asset, id int) error {
 			upd_avail := diff + assetExisted.Avail_quantity
 			bind = append(bind, upd_avail)
 			query += " avail_quantity = ?,"
+			assetExisted.Avail_quantity = upd_avail
 		}
 
 		if asset.Initial_quantity < assetExisted.Avail_quantity {
@@ -162,8 +163,29 @@ func (ar *assetRepo) Update(assetExisted, asset entities.Asset, id int) error {
 		query += " photo = ?,"
 	}
 
-	bind = append(bind, asset.Is_maintenance)
-	query += " is_maintenance = ?,"
+	if asset.Is_maintenance == true {
+		if asset.Initial_quantity == 0 {
+			if assetExisted.Avail_quantity == assetExisted.Initial_quantity {
+				bind = append(bind, asset.Is_maintenance)
+				query += " is_maintenance = ?,"
+
+				bind = append(bind, 0)
+				query += " avail_quantity = ?,"
+			} else {
+				return fmt.Errorf("All asset must be in maintenence!")
+			}
+		} else {
+			if assetExisted.Avail_quantity == asset.Initial_quantity {
+				bind = append(bind, asset.Is_maintenance)
+				query += " is_maintenance = ?,"
+
+				bind = append(bind, 0)
+				query += " avail_quantity = ?,"
+			} else {
+				return fmt.Errorf("All asset must be in maintenence!")
+			}
+		}
+	}
 
 	bind = append(bind, id)
 	query += " updated_at = now() WHERE id = ? AND deleted_at is null"
