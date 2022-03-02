@@ -161,7 +161,7 @@ func (rr *requestRepo) GetAdmin(request_date, status, filter_date string, limit,
 	}
 
 	if request_date == "latest" {
-		condition += "order by r.request_date desc "
+		condition += "order by r.request_date desc, r.return_date desc "
 	} else if request_date == "oldest" {
 		condition += "order by r.request_date asc "
 	}

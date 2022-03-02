@@ -22,6 +22,7 @@ func (ar *authRepo) LoginEmail(email, password string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	defer result.Close()
 	if isExist := result.Next(); !isExist {
 		return "", fmt.Errorf("id not found")
 	}
@@ -42,6 +43,7 @@ func (ar *authRepo) GetPasswordByEmail(email string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	defer result.Close()
 	if isExist := result.Next(); !isExist {
 		return "", fmt.Errorf("id not found")
 	}
@@ -59,6 +61,7 @@ func (ar *authRepo) GetIdByEmail(email string) (int, error) {
 	if err != nil {
 		return 0, err
 	}
+	defer result.Close()
 	if isExist := result.Next(); !isExist {
 		return 0, fmt.Errorf("id not found")
 	}
@@ -75,6 +78,7 @@ func (ar *authRepo) GetIdRole(email string) (int, error) {
 	if err != nil {
 		return 0, err
 	}
+	defer result.Close()
 	if isExist := result.Next(); !isExist {
 		return 0, fmt.Errorf("id not found")
 	}
@@ -92,6 +96,7 @@ func (ar *authRepo) GetNameByEmail(email string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	defer result.Close()
 	if isExist := result.Next(); !isExist {
 		return "", fmt.Errorf("id not found")
 	}
