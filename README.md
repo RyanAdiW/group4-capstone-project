@@ -1,7 +1,7 @@
 
 <!-- ABOUT THE PROJECT -->
 ### 💻 &nbsp;About The Project
-Final Project
+Employee Assets Management
 
 ### 🕮 &nbsp;OpenAPI Documentation
 
