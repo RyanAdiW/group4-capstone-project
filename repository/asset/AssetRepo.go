@@ -185,6 +185,20 @@ func (ar *assetRepo) Update(assetExisted, asset entities.Asset, id int) error {
 				return fmt.Errorf("All asset must be in maintenence!")
 			}
 		}
+	} else {
+		if asset.Initial_quantity == 0 {
+			bind = append(bind, asset.Is_maintenance)
+			query += " is_maintenance = ?,"
+
+			bind = append(bind, assetExisted.Initial_quantity)
+			query += " avail_quantity = ?,"
+		} else {
+			bind = append(bind, asset.Is_maintenance)
+			query += " is_maintenance = ?,"
+
+			bind = append(bind, asset.Initial_quantity)
+			query += " avail_quantity = ?,"
+		}
 	}
 
 	bind = append(bind, id)
