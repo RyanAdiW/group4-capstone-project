@@ -246,7 +246,7 @@ func (ar *assetRepo) GetSummaryAsset() (entities.SummaryAsset, error) {
 	if err != nil {
 		return summary, err
 	}
-	summary.Use = summary.Total_asset - summary.Available
+	summary.Use = summary.Total_asset - summary.Available - summary.Maintenance
 
 	return summary, nil
 }
