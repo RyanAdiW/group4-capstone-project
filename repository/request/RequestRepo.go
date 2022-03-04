@@ -287,7 +287,7 @@ func (rr *requestRepo) GetEmployee(id_employee int, is_history bool, limit, offs
 		condition += "and r.id_status in (6,7,8) "
 	}
 
-	condition += "order by r.request_date desc "
+	condition += "order by r.updated_at desc "
 
 	if limit != 0 && offset == 0 {
 		bind = append(bind, limit)
