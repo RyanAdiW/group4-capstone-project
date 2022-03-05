@@ -154,8 +154,6 @@ func (rc RequestController) UpdateRequestStatus() echo.HandlerFunc {
 					return c.JSON(http.StatusUnauthorized, response.UnauthorizedRequest("unauthorized", "id_status must be 3 || 4"))
 				}
 			}
-		default:
-			return c.JSON(http.StatusUnauthorized, response.UnauthorizedRequest("unauthorized", "id_status must be 3 || 4"))
 		}
 
 		// update request based on id to database

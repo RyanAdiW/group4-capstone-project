@@ -36,10 +36,7 @@ func (uc UserController) CreateUserController() echo.HandlerFunc {
 		//set password
 		password := []byte(userRequest.Password)
 
-		hashedPassword, errEncrypt := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
-		if errEncrypt != nil {
-			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to encrpyt password"))
-		}
+		hashedPassword, _ := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
 		existingEmail, errEmail := uc.repository.GetEmail()
 		if errEmail != nil {
 			log.Println("error from repo")
