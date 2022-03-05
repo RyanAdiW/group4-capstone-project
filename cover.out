@@ -1,0 +1,23 @@
+mode: set
+sirclo/project/capstone/delivery/controllers/user/user.go:22.64,24.2 1 1
+sirclo/project/capstone/delivery/controllers/user/user.go:27.66,28.36 1 1
+sirclo/project/capstone/delivery/controllers/user/user.go:28.36,31.46 2 1
+sirclo/project/capstone/delivery/controllers/user/user.go:37.3,41.22 4 1
+sirclo/project/capstone/delivery/controllers/user/user.go:46.3,54.35 2 1
+sirclo/project/capstone/delivery/controllers/user/user.go:61.3,62.17 2 1
+sirclo/project/capstone/delivery/controllers/user/user.go:67.3,67.99 1 1
+sirclo/project/capstone/delivery/controllers/user/user.go:31.46,34.4 2 1
+sirclo/project/capstone/delivery/controllers/user/user.go:41.22,44.4 2 0
+sirclo/project/capstone/delivery/controllers/user/user.go:54.35,55.29 1 1
+sirclo/project/capstone/delivery/controllers/user/user.go:55.29,57.5 1 1
+sirclo/project/capstone/delivery/controllers/user/user.go:62.17,65.4 2 1
+sirclo/project/capstone/delivery/controllers/user/user.go:72.63,73.36 1 1
+sirclo/project/capstone/delivery/controllers/user/user.go:73.36,77.17 2 1
+sirclo/project/capstone/delivery/controllers/user/user.go:81.3,82.17 2 1
+sirclo/project/capstone/delivery/controllers/user/user.go:86.3,86.95 1 1
+sirclo/project/capstone/delivery/controllers/user/user.go:77.17,79.4 1 1
+sirclo/project/capstone/delivery/controllers/user/user.go:82.17,84.4 1 1
+sirclo/project/capstone/delivery/controllers/user/user.go:91.64,92.36 1 1
+sirclo/project/capstone/delivery/controllers/user/user.go:92.36,94.17 2 1
+sirclo/project/capstone/delivery/controllers/user/user.go:97.3,97.100 1 1
+sirclo/project/capstone/delivery/controllers/user/user.go:94.17,96.4 1 1
