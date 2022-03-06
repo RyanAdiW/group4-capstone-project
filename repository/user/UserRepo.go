@@ -82,26 +82,6 @@ func (ur *userRepo) GetById(id int) (entities.User, error) {
 	return user, nil
 }
 
-// update user
-func (ur *userRepo) Update(user entities.User, id int) error {
-	res, err := ur.db.Exec("UPDATE users SET name = ?, email = ?, divisi = ?, id_role = ?, updated_at = now() WHERE id = ? AND deleted_at is null", user.Name, user.Email, user.Divisi, user.Id_role, id)
-	row, _ := res.RowsAffected()
-	if row == 0 {
-		return fmt.Errorf("id not found")
-	}
-	return err
-}
-
-// delete user
-func (ur *userRepo) Delete(id int) error {
-	res, err := ur.db.Exec("UPDATE users SET deleted_at = now() WHERE id = ? AND deleted_at is null", id)
-	row, _ := res.RowsAffected()
-	if row == 0 {
-		return fmt.Errorf("id not found")
-	}
-	return err
-}
-
 // get email user
 func (ur *userRepo) GetEmail() ([]entities.User, error) {
 	var users []entities.User

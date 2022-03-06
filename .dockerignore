@@ -1,0 +1,5 @@
+cover.out
+user_test.go
+request_test.go
+asset_test.go
+auth_test.go
