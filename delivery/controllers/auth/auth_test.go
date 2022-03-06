@@ -6,7 +6,8 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"sirclo/project/capstone/entities"
+	"sirclo/project/capstone/delivery/common"
+	_middlewares "sirclo/project/capstone/delivery/middleware"
 	"testing"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -16,22 +17,23 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func TestLoginEmailController(t *testing.T) {
+func TestLogin(t *testing.T) {
 	t.Run("Success Login", func(t *testing.T) {
 		e := echo.New()
 		requestBody, _ := json.Marshal(map[string]string{
-			"Password": "asdasd",
-			"Email":    "asd",
+			"password": "sasuke",
+			"email":    "sasuke@mail.com",
 		})
 		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(requestBody))
 		res := httptest.NewRecorder()
 		req.Header.Set("Content-Type", "application/json")
 		context := e.NewContext(req, res)
 
-		AuthController := New(mockAuthRepository{})
-		if assert.NoError(t, (AuthController.Login())(context)) {
+		AuthController := NewAuthController(mockAuthRepository{})
+		if assert.NoError(t, (AuthController.LoginEmailController())(context)) {
 			bodyResponses := res.Body.String()
-			var response entities.Login
+			fmt.Println(bodyResponses)
+			var response LoginResponseFormat
 			err := json.Unmarshal([]byte(bodyResponses), &response)
 			if err != nil {
 				assert.Error(t, err, "error")
@@ -50,81 +52,59 @@ func TestLoginEmailController(t *testing.T) {
 		req.Header.Set("Content-Type", "application/json")
 		context := e.NewContext(req, res)
 
-		AuthController := New(mockAuthRepository{})
-		if assert.NoError(t, (AuthController.Login())(context)) {
+		AuthController := NewAuthController(mockAuthRepository{})
+		if assert.NoError(t, (AuthController.LoginEmailController())(context)) {
 			bodyResponses := res.Body.String()
-			var response entities.Login
+			var response common.DefaultResponse
 			err := json.Unmarshal([]byte(bodyResponses), &response)
 			if err != nil {
 				assert.Error(t, err, "error")
 			}
-			assert.Equal(t, 403, res.Code)
+			assert.Equal(t, 400, res.Code)
 		}
 	})
 	t.Run("Failed Login because wrong email/password", func(t *testing.T) {
 		e := echo.New()
 		requestBody, _ := json.Marshal(map[string]interface{}{
 			"Password": "asdasd",
-			"Email":    "gagal",
+			"Email":    "sasukes@mail.com",
 		})
 		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(requestBody))
 		res := httptest.NewRecorder()
 		req.Header.Set("Content-Type", "application/json")
 		context := e.NewContext(req, res)
 
-		AuthController := New(mockAuthRepository{})
-		if assert.NoError(t, (AuthController.Login())(context)) {
+		AuthController := NewAuthController(mockAuthRepository{})
+		if assert.NoError(t, (AuthController.LoginEmailController())(context)) {
 			bodyResponses := res.Body.String()
-			var response entities.Login
+			var response common.DefaultResponse
 			err := json.Unmarshal([]byte(bodyResponses), &response)
 			if err != nil {
 				assert.Error(t, err, "error")
 			}
-			assert.Equal(t, 403, res.Code)
+			assert.Equal(t, 400, res.Code)
 		}
 	})
-	t.Run("Failed Login because failed hashing", func(t *testing.T) {
+	t.Run("Failed create token", func(t *testing.T) {
 		e := echo.New()
 		requestBody, _ := json.Marshal(map[string]interface{}{
 			"Password": "asdasd",
-			"Email":    "gagalhash",
+			"Email":    "sasuke",
 		})
 		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(requestBody))
 		res := httptest.NewRecorder()
 		req.Header.Set("Content-Type", "application/json")
 		context := e.NewContext(req, res)
 
-		AuthController := New(mockAuthRepository{})
-		if assert.NoError(t, (AuthController.Login())(context)) {
+		AuthController := NewAuthController(mockAuthRepository{})
+		if assert.NoError(t, (AuthController.LoginEmailController())(context)) {
 			bodyResponses := res.Body.String()
-			var response entities.Login
+			var response common.DefaultResponse
 			err := json.Unmarshal([]byte(bodyResponses), &response)
 			if err != nil {
 				assert.Error(t, err, "error")
 			}
-			assert.Equal(t, 403, res.Code)
-		}
-	})
-	t.Run("Failed Login because login function failed", func(t *testing.T) {
-		e := echo.New()
-		requestBody, _ := json.Marshal(map[string]interface{}{
-			"Password": "asdasd",
-			"Email":    "gagallogin",
-		})
-		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(requestBody))
-		res := httptest.NewRecorder()
-		req.Header.Set("Content-Type", "application/json")
-		context := e.NewContext(req, res)
-
-		AuthController := New(mockAuthRepository{})
-		if assert.NoError(t, (AuthController.Login())(context)) {
-			bodyResponses := res.Body.String()
-			var response entities.Login
-			err := json.Unmarshal([]byte(bodyResponses), &response)
-			if err != nil {
-				assert.Error(t, err, "error")
-			}
-			assert.Equal(t, 500, res.Code)
+			assert.Equal(t, 400, res.Code)
 		}
 	})
 }
@@ -133,43 +113,53 @@ func TestLoginEmailController(t *testing.T) {
 
 type mockAuthRepository struct{}
 
-func (m mockAuthRepository) Register(User entities.User) error {
-	if User.Email == "gagalregister" {
-		return fmt.Errorf("email not unique")
+func (m mockAuthRepository) LoginEmail(email, password string) (string, error) {
+	if email == "sasuke@mail.com" {
+		token, err := _middlewares.CreateToken(1, email, 1)
+		if err != nil {
+			return "", err
+		}
+
+		return token, nil
 	}
-	return nil
+
+	return "", fmt.Errorf("failed create token")
 }
 
-func (m mockAuthRepository) Login(email string) (entities.Login, error) {
-	var gagal entities.Login
-	if email == "gagallogin" {
-		return gagal, fmt.Errorf("servernya mati")
+func (m mockAuthRepository) GetPasswordByEmail(email string) (string, error) {
+	if email == "sasuke@mail.com" {
+		sandi, _ := bcrypt.GenerateFromPassword([]byte("sasuke"), bcrypt.DefaultCost)
+		return string(sandi), nil
 	}
-	// sukses
-	return entities.Login{
-		Id:    1,
-		Name:  "asd",
-		Email: "asd@gmail.com",
-		Token: "asdasd",
-	}, nil
+
+	if email == "sasukes@mail.com" {
+		sandi, _ := bcrypt.GenerateFromPassword([]byte("salah"), bcrypt.DefaultCost)
+		return string(sandi), nil
+	}
+
+	return "", fmt.Errorf("no record")
 }
 
-func (m mockAuthRepository) FindUserByEmail(email string) (entities.User, error) {
-	var gagal entities.User
-	if email == "gagal" {
-		return gagal, fmt.Errorf("user not found")
+func (m mockAuthRepository) GetIdByEmail(email string) (int, error) {
+	if email == "sasuke@mail.com" {
+		return 1, nil
 	}
-	if email == "gagalhash" {
-		return entities.User{
-			Id:       1,
-			Email:    "asd@gmail.com",
-			Password: "asd",
-		}, nil
+
+	return 0, fmt.Errorf("no record")
+}
+
+func (m mockAuthRepository) GetIdRole(email string) (int, error) {
+	if email == "sasuke@mail.com" {
+		return 1, nil
 	}
-	sandi, _ := bcrypt.GenerateFromPassword([]byte("asdasd"), bcrypt.MinCost)
-	return entities.User{
-		Id:       1,
-		Email:    "asd@gmail.com",
-		Password: string(sandi),
-	}, nil
+
+	return 0, fmt.Errorf("no record")
+}
+
+func (m mockAuthRepository) GetNameByEmail(email string) (string, error) {
+	if email == "sasuke@mail.com" {
+		return "sasuke", nil
+	}
+
+	return "", fmt.Errorf("no record")
 }
