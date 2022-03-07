@@ -187,8 +187,8 @@ func (ac AssetController) UpdateAssetController() echo.HandlerFunc {
 		//asset existed
 		assetExisted, err := ac.repository.GetById(id_asset)
 		if err != nil {
-			log.Println("err get date asset: ", err)
-			return c.JSON(http.StatusInternalServerError, response.InternalServerError("error", "err get date asset"))
+			log.Println("err get data asset: ", err)
+			return c.JSON(http.StatusInternalServerError, response.InternalServerError("error", "err get data asset"))
 		}
 
 		//bind data photo
@@ -238,7 +238,7 @@ func (ac AssetController) UpdateAssetController() echo.HandlerFunc {
 		errUpdate := ac.repository.Update(assetExisted, asset, id_asset)
 		if errUpdate != nil {
 			fmt.Println(errUpdate)
-			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", errUpdate.Error()))
+			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed update data"))
 		}
 
 		return c.JSON(http.StatusOK, response.SuccessOperationDefault("success", "success update asset"))
