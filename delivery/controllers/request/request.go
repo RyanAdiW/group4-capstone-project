@@ -155,6 +155,9 @@ func (rc RequestController) UpdateRequestStatus() echo.HandlerFunc {
 				}
 			}
 		}
+		if request.Id_status == 6 || request.Id_status == 8 {
+			request.Return_date = "0000-00-00"
+		}
 
 		// update request based on id to database
 		errUpdate := rc.repository.Update(request, id_request)
