@@ -133,7 +133,7 @@ func (rr *requestRepo) GetAvailQty(id int) (entities.Request, error) {
 }
 
 // get requests (admin)
-func (rr *requestRepo) GetAdmin(request_date, status, filter_date, category string, limit, offset int) ([]entities.RequestResponse, error) {
+func (rr *requestRepo) GetAdmin(return_date, request_date, status, filter_date, category string, limit, offset int) ([]entities.RequestResponse, error) {
 	var condition string
 	var cond_limit string
 	var requests []entities.RequestResponse
@@ -166,9 +166,15 @@ func (rr *requestRepo) GetAdmin(request_date, status, filter_date, category stri
 	}
 
 	if request_date == "latest" {
-		condition += "order by r.request_date desc, r.return_date desc "
+		condition += "order by r.request_date desc "
 	} else if request_date == "oldest" {
 		condition += "order by r.request_date asc "
+	}
+
+	if return_date == "longest" {
+		condition += "order by r.return_date desc "
+	} else if return_date == "shortest" {
+		condition += "order by r.return_date asc "
 	}
 
 	if limit != 0 && offset == 0 {
@@ -210,7 +216,7 @@ func (rr *requestRepo) GetAdmin(request_date, status, filter_date, category stri
 }
 
 // get requests (manager)
-func (rr *requestRepo) GetManager(request_date, status, filter_date, category string, limit, offset int) ([]entities.RequestResponse, error) {
+func (rr *requestRepo) GetManager(return_date, request_date, status, filter_date, category string, limit, offset int) ([]entities.RequestResponse, error) {
 	var condition string
 	var requests []entities.RequestResponse
 	var cond_limit string
@@ -246,6 +252,12 @@ func (rr *requestRepo) GetManager(request_date, status, filter_date, category st
 		condition += "order by r.request_date desc "
 	} else if request_date == "oldest" {
 		condition += "order by r.request_date asc "
+	}
+
+	if return_date == "longest" {
+		condition += "order by r.return_date desc "
+	} else if return_date == "shortest" {
+		condition += "order by r.return_date asc "
 	}
 
 	if limit != 0 && offset == 0 {

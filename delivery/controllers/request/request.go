@@ -199,6 +199,7 @@ func (rc *RequestController) GetRequestsController() echo.HandlerFunc {
 			return c.JSON(http.StatusUnauthorized, response.UnauthorizedRequest("unauthorized", "unauthorized access"))
 		}
 
+		return_date := c.QueryParam("return_date")
 		request_date := c.QueryParam("request_date")
 		status := c.QueryParam("status")
 		filter_date := c.QueryParam("filter_date")
@@ -220,15 +221,15 @@ func (rc *RequestController) GetRequestsController() echo.HandlerFunc {
 		total_page := 0
 		switch idRole {
 		case 1:
-			requests, err = rc.repository.GetAdmin(request_date, status, filter_date, category, limit, offset)
+			requests, err = rc.repository.GetAdmin(return_date, request_date, status, filter_date, category, limit, offset)
 			if limit > 0 {
-				requeststotpage, _ := rc.repository.GetAdmin(request_date, status, filter_date, category, 0, 0)
+				requeststotpage, _ := rc.repository.GetAdmin(return_date, request_date, status, filter_date, category, 0, 0)
 				total_page = (len(requeststotpage) / limit) + 1
 			}
 		case 3:
-			requests, err = rc.repository.GetManager(request_date, status, filter_date, category, limit, offset)
+			requests, err = rc.repository.GetManager(return_date, request_date, status, filter_date, category, limit, offset)
 			if limit > 0 {
-				requeststotpage, _ := rc.repository.GetManager(request_date, status, filter_date, category, 0, 0)
+				requeststotpage, _ := rc.repository.GetManager(return_date, request_date, status, filter_date, category, 0, 0)
 
 				if len(requeststotpage)%limit == 0 {
 					total_page = (len(requeststotpage) / limit)
