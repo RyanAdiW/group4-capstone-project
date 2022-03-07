@@ -133,7 +133,7 @@ func (rr *requestRepo) GetAvailQty(id int) (entities.Request, error) {
 }
 
 // get requests (admin)
-func (rr *requestRepo) GetAdmin(request_date, status, filter_date string, limit, offset int) ([]entities.RequestResponse, error) {
+func (rr *requestRepo) GetAdmin(request_date, status, filter_date, category string, limit, offset int) ([]entities.RequestResponse, error) {
 	var condition string
 	var cond_limit string
 	var requests []entities.RequestResponse
@@ -143,11 +143,11 @@ func (rr *requestRepo) GetAdmin(request_date, status, filter_date string, limit,
 	if status != "" {
 		switch status {
 		case "new":
-			condition += "and r.id_status = 1 or r.id_status = 3 "
+			condition += "and (r.id_status = 1 or r.id_status = 3) "
 		case "using":
 			condition += "and r.id_status = 6 "
 		case "reject":
-			condition += "and r.id_status = 4 or r.id_status = 5"
+			condition += "and (r.id_status = 4 or r.id_status = 5) "
 		case "returned":
 			condition += "and r.id_status = 8 "
 		default:
@@ -158,6 +158,11 @@ func (rr *requestRepo) GetAdmin(request_date, status, filter_date string, limit,
 	if filter_date != "" {
 		bind = append(bind, "%"+filter_date+"%")
 		condition += "and r.request_date LIKE ? "
+	}
+
+	if category != "" {
+		bind = append(bind, "%"+category+"%")
+		condition += "and c.description LIKE ? "
 	}
 
 	if request_date == "latest" {
@@ -205,7 +210,7 @@ func (rr *requestRepo) GetAdmin(request_date, status, filter_date string, limit,
 }
 
 // get requests (manager)
-func (rr *requestRepo) GetManager(request_date, status, filter_date string, limit, offset int) ([]entities.RequestResponse, error) {
+func (rr *requestRepo) GetManager(request_date, status, filter_date, category string, limit, offset int) ([]entities.RequestResponse, error) {
 	var condition string
 	var requests []entities.RequestResponse
 	var cond_limit string
@@ -230,6 +235,11 @@ func (rr *requestRepo) GetManager(request_date, status, filter_date string, limi
 	if filter_date != "" {
 		bind = append(bind, "%"+filter_date+"%")
 		condition += "and r.request_date LIKE ? "
+	}
+
+	if category != "" {
+		bind = append(bind, "%"+category+"%")
+		condition += "and c.description LIKE ? "
 	}
 
 	if request_date == "latest" {
