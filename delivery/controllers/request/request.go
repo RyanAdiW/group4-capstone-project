@@ -227,9 +227,9 @@ func (rc *RequestController) GetRequestsController() echo.HandlerFunc {
 				total_page = (len(requeststotpage) / limit) + 1
 			}
 		case 3:
-			requests, err = rc.repository.GetManager(request_date, status, filter_date, category, limit, offset)
+			requests, err = rc.repository.GetManager(return_date, request_date, status, filter_date, category, limit, offset)
 			if limit > 0 {
-				requeststotpage, _ := rc.repository.GetManager(request_date, status, filter_date, category, 0, 0)
+				requeststotpage, _ := rc.repository.GetManager(return_date, request_date, status, filter_date, category, 0, 0)
 
 				if len(requeststotpage)%limit == 0 {
 					total_page = (len(requeststotpage) / limit)

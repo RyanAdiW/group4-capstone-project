@@ -1018,7 +1018,7 @@ func (m mockRequestRepository) Create(entities.Request) error {
 func (m mockRequestRepository) GetAdmin(return_date, request_date, status, filter_date, category string, limit, offset int) ([]entities.RequestResponse, error) {
 	return nil, nil
 }
-func (m mockRequestRepository) GetManager(request_date, status, filter_date, category string, limit, offset int) ([]entities.RequestResponse, error) {
+func (m mockRequestRepository) GetManager(return_date, request_date, status, filter_date, category string, limit, offset int) ([]entities.RequestResponse, error) {
 	return nil, nil
 }
 func (m mockRequestRepository) GetById(int) (entities.RequestResponse, error) {
@@ -1045,7 +1045,7 @@ func (m mockErrorRequestRepository) Create(entities.Request) error {
 func (m mockErrorRequestRepository) GetAdmin(return_date, request_date, status, filter_date, category string, limit, offset int) ([]entities.RequestResponse, error) {
 	return nil, fmt.Errorf("error")
 }
-func (m mockErrorRequestRepository) GetManager(request_date, status, filter_date, category string, limit, offset int) ([]entities.RequestResponse, error) {
+func (m mockErrorRequestRepository) GetManager(return_date, request_date, status, filter_date, category string, limit, offset int) ([]entities.RequestResponse, error) {
 	return nil, fmt.Errorf("error")
 }
 func (m mockErrorRequestRepository) GetById(int) (entities.RequestResponse, error) {
