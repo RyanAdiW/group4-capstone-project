@@ -155,7 +155,7 @@ func (rc RequestController) UpdateRequestStatus() echo.HandlerFunc {
 				}
 			}
 		}
-		if request.Id_status == 6 || request.Id_status == 8 {
+		if request.Id_status == 8 || request.Id_status == 4 || request.Id_status == 5 {
 			request.Return_date = "0000-00-00"
 		}
 
