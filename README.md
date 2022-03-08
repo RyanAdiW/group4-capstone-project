@@ -1,3 +1,20 @@
+# E-Assets
+<div id="top"></div>
+<!-- PROJECT LOGO -->
+<br/>
+<div align="center">
+    <img src="https://cdn.freelogodesign.org/files/508cd32b6e024b2cb3681aa96cf1afad/thumb/logo_200x200.png?v=637819523170000000" alt="Logo">
+
+  <h3 align="center">Project "E-Assets"</h3>
+
+  <p align="center">
+    Projek Capstone Pembangunan RESTful API Program SIRCLO Tech Academy by Alterra
+    <br />
+    <a href="https://github.com/RyanAdiW/group4-capstone-project"><strong>Kunjungi kami »</strong></a>
+    <br />
+  </p>
+</div>
+
 
 <!-- ABOUT THE PROJECT -->
 ## 💻 &nbsp;About The Project
