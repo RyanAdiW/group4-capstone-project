@@ -310,7 +310,7 @@ func (rr *requestRepo) GetEmployee(id_employee int, is_history bool, limit, offs
 		cond_limit += "limit ?, ?"
 	}
 
-	res, err := rr.db.Query(`select r.id, r.id_user, r.id_asset, r.id_status, r.request_date, r.return_date, r.description, u.name as user_name, a.name as asset_name, c.description as category, a.avail_quantity, s.description as status , a.photo
+	res, err := rr.db.Query(`select r.id, r.id_user, r.id_asset, r.id_status, a.id_category, r.request_date, r.return_date, r.description, u.name as user_name, a.name as asset_name, c.description as category, a.avail_quantity, s.description as status , a.photo
 	from requests r
 	join users u on u.id = r.id_user
 	join status_check s on s.id = r.id_status
@@ -326,7 +326,7 @@ func (rr *requestRepo) GetEmployee(id_employee int, is_history bool, limit, offs
 	for res.Next() {
 		var request entities.RequestResponse
 
-		err = res.Scan(&request.Id, &request.Id_user, &request.Id_asset, &request.Id_status, &request.Request_date, &request.Return_date, &request.Description, &request.User_name, &request.Asset_name, &request.Category, &request.Avail_quantity, &request.Status, &request.Photo)
+		err = res.Scan(&request.Id, &request.Id_user, &request.Id_asset, &request.Id_status, &request.Id_category, &request.Request_date, &request.Return_date, &request.Description, &request.User_name, &request.Asset_name, &request.Category, &request.Avail_quantity, &request.Status, &request.Photo)
 		if err != nil {
 			fmt.Println(err)
 			return nil, err

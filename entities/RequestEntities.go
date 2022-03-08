@@ -21,6 +21,7 @@ type RequestResponse struct {
 	Id_user        int    `json:"id_user" form:"id_user"`
 	Id_asset       int    `json:"id_asset" form:"id_asset"`
 	Id_status      int    `json:"id_status" form:"id_status"`
+	Id_category    int    `json:"id_category" form:"id_category"`
 	Request_date   string `json:"request_date" form:"request_date"`
 	Return_date    string `json:"return_date" form:"return_date"`
 	Description    string `json:"description" form:"description"`
