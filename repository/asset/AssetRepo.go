@@ -40,7 +40,7 @@ func (ar *assetRepo) Create(asset entities.Asset) error {
 // get all asset with filter
 func (ar *assetRepo) Get(category, maintenance, avail string, limit, offset int) ([]entities.Asset, error) {
 	var condition string
-	var cond_limit string
+	var condLimit string
 
 	var bind []interface{}
 
@@ -48,15 +48,6 @@ func (ar *assetRepo) Get(category, maintenance, avail string, limit, offset int)
 		bind = append(bind, category)
 		condition += " and c.id=? "
 	}
-
-	// if maintenance != "" {
-	// 	switch maintenance {
-	// 	case "no":
-	// 		condition += " and a.is_maintenance = false"
-	// 	case "yes":
-	// 		condition += " and a.is_maintenance = true"
-	// 	}
-	// }
 
 	if avail != "" {
 		switch avail {
@@ -69,20 +60,20 @@ func (ar *assetRepo) Get(category, maintenance, avail string, limit, offset int)
 
 	if limit != 0 && offset == 0 {
 		bind = append(bind, limit)
-		cond_limit += "limit ?"
+		condLimit += "limit ?"
 	}
 
 	if limit != 0 && offset != 0 {
 		bind = append(bind, offset)
 		bind = append(bind, limit)
-		cond_limit += "limit ?, ?"
+		condLimit += "limit ?, ?"
 	}
 
 	var assets []entities.Asset
 	results, err := ar.db.Query(`select a.id, a.id_category, a.is_maintenance, a.name, a.description, a.initial_quantity, a.avail_quantity, a.photo, c.description as category
 								from assets a
 								join categories c on c.id = a.id_category
-								where a.deleted_at is null`+condition+` order by a.id asc `+cond_limit, bind...)
+								where a.deleted_at is null`+condition+` order by a.id asc `+condLimit, bind...)
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -147,10 +138,10 @@ func (ar *assetRepo) Update(assetExisted, asset entities.Asset, id int) error {
 
 		if asset.Initial_quantity > assetExisted.Initial_quantity {
 			diff := asset.Initial_quantity - assetExisted.Initial_quantity
-			upd_avail := diff + assetExisted.Avail_quantity
-			bind = append(bind, upd_avail)
+			updAvail := diff + assetExisted.Avail_quantity
+			bind = append(bind, updAvail)
 			query += " avail_quantity = ?,"
-			assetExisted.Avail_quantity = upd_avail
+			assetExisted.Avail_quantity = updAvail
 		}
 
 		if asset.Initial_quantity < assetExisted.Avail_quantity {
@@ -252,19 +243,19 @@ func (ar *assetRepo) GetSummaryAsset() (entities.SummaryAsset, error) {
 }
 
 func (ar *assetRepo) GetHistoryUsage(id_asset, limit, offset int) (entities.HistoryUsage, error) {
-	var cond_limit string
+	var condLimit string
 	var bind []interface{}
 
 	bind = append(bind, id_asset)
 	if limit != 0 && offset == 0 {
 		bind = append(bind, limit)
-		cond_limit += "limit ?"
+		condLimit += "limit ?"
 	}
 
 	if limit != 0 && offset != 0 {
 		bind = append(bind, offset)
 		bind = append(bind, limit)
-		cond_limit += "limit ?, ?"
+		condLimit += "limit ?, ?"
 	}
 
 	var historyUsage entities.HistoryUsage
@@ -275,7 +266,7 @@ func (ar *assetRepo) GetHistoryUsage(id_asset, limit, offset int) (entities.Hist
 								left join requests r on r.id_asset = a.id and r.deleted_at is null
 								join users u on u.id = r.id_user
 								join status_check s on s.id = r.id_status
-								WHERE a.id = ? `+cond_limit, bind...)
+								WHERE a.id = ? `+condLimit, bind...)
 	if err != nil {
 		log.Println(err)
 		return historyUsage, err

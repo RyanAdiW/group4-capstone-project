@@ -4,6 +4,6 @@ type Auth interface {
 	LoginEmail(email, password string) (string, error)
 	GetPasswordByEmail(email string) (string, error)
 	GetIdByEmail(email string) (int, error)
-	GetIdRole(Email string) (int, error)
-	GetNameByEmail(Email string) (string, error)
+	GetIdRole(email string) (int, error)
+	GetNameByEmail(email string) (string, error)
 }
