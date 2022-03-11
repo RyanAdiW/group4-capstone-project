@@ -9,6 +9,4 @@ type UserRepo interface {
 	Get() ([]entities.User, error)
 	GetById(int) (entities.User, error)
 	GetEmail() ([]entities.User, error)
-	// Update(entities.User, int) error
-	// Delete(int) error
 }

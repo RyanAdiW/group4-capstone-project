@@ -28,9 +28,9 @@ func NewAssetController(asset assetRepo.AssetRepo) *AssetController {
 // 1. create asset controller
 func (ac AssetController) CreateAssetController() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		idrole, err := middlewares.GetIdRole(c)
+		idRole, err := middlewares.GetIdRole(c)
 
-		if err != nil || idrole != 1 {
+		if err != nil || idRole != 1 {
 			return c.JSON(http.StatusUnauthorized, response.UnauthorizedRequest("unauthorized", "unauthorized access"))
 		}
 
@@ -43,7 +43,7 @@ func (ac AssetController) CreateAssetController() echo.HandlerFunc {
 
 		//bind data photo
 		// Multipart form
-		var url_photo string
+		var urlPhoto string
 		form, err := c.MultipartForm()
 		if err == nil {
 			files := form.File["photo"]
@@ -69,8 +69,8 @@ func (ac AssetController) CreateAssetController() echo.HandlerFunc {
 					return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to join, photo size too big"))
 				}
 
-				filename := "assets_pic/" + strconv.Itoa(userRequest.Id_category) + "_" + userRequest.Name + fileExtension
-				url_photo, err = util.UploadToS3(&src, filename)
+				fileName := "assets_pic/" + strconv.Itoa(userRequest.Id_category) + "_" + userRequest.Name + fileExtension
+				urlPhoto, err = util.UploadToS3(&src, fileName)
 				if err != nil {
 					return err
 				}
@@ -82,7 +82,7 @@ func (ac AssetController) CreateAssetController() echo.HandlerFunc {
 			Description:      userRequest.Description,
 			Initial_quantity: userRequest.Initial_quantity,
 			Avail_quantity:   userRequest.Initial_quantity,
-			Photo:            url_photo,
+			Photo:            urlPhoto,
 			Id_category:      userRequest.Id_category,
 		}
 
@@ -104,15 +104,15 @@ func (ac AssetController) GetAssetsController() echo.HandlerFunc {
 		maintenance := c.QueryParam("maintenance")
 		avail := c.QueryParam("avail")
 
-		limitstr := c.QueryParam("limit")
-		offsetstr := c.QueryParam("offset")
+		limitStr := c.QueryParam("limit")
+		offsetStr := c.QueryParam("offset")
 
-		limit, err := strconv.Atoi(limitstr)
+		limit, err := strconv.Atoi(limitStr)
 		if err != nil {
 			limit = 0
 		}
 
-		offset, err := strconv.Atoi(offsetstr)
+		offset, err := strconv.Atoi(offsetStr)
 		if err != nil {
 			offset = 0
 		}
@@ -122,18 +122,18 @@ func (ac AssetController) GetAssetsController() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to fetch data"))
 		}
 
-		total_page := 0
+		totalPage := 0
 		if limit > 0 {
-			assetsfortotpage, _ := ac.repository.Get(category, maintenance, avail, 0, 0)
-			if len(assetsfortotpage)%limit == 0 {
-				total_page = (len(assetsfortotpage) / limit)
+			assetsforTotPage, _ := ac.repository.Get(category, maintenance, avail, 0, 0)
+			if len(assetsforTotPage)%limit == 0 {
+				totalPage = (len(assetsforTotPage) / limit)
 			} else {
-				total_page = (len(assetsfortotpage) / limit) + 1
+				totalPage = (len(assetsforTotPage) / limit) + 1
 			}
 		}
 		return c.JSON(http.StatusOK, response.SuccessOperation("success", "success get all assets", map[string]interface{}{
-			"total_page": total_page,
-			"data":       assets,
+			"totalPage": totalPage,
+			"data":      assets,
 		}))
 	}
 }
@@ -148,13 +148,13 @@ func (ac AssetController) GetAssetByIdController() echo.HandlerFunc {
 		}
 
 		// get id from param
-		assetid, err := strconv.Atoi(c.Param("id"))
+		assetId, err := strconv.Atoi(c.Param("id"))
 
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to convert id"))
 		}
 		// get user from db
-		asset, err := ac.repository.GetById(assetid)
+		asset, err := ac.repository.GetById(assetId)
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to fetch data"))
 		}
@@ -166,14 +166,14 @@ func (ac AssetController) GetAssetByIdController() echo.HandlerFunc {
 // 4. update asset
 func (ac AssetController) UpdateAssetController() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		idrole, err := middlewares.GetIdRole(c)
+		idRole, err := middlewares.GetIdRole(c)
 
-		if err != nil || idrole != 1 {
+		if err != nil || idRole != 1 {
 			return c.JSON(http.StatusUnauthorized, response.UnauthorizedRequest("unauthorized", "unauthorized access"))
 		}
 
 		// get id from param
-		id_asset, errConv := strconv.Atoi(c.Param("id"))
+		idAsset, errConv := strconv.Atoi(c.Param("id"))
 		if errConv != nil {
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to convert id"))
 		}
@@ -185,7 +185,7 @@ func (ac AssetController) UpdateAssetController() echo.HandlerFunc {
 		}
 
 		//asset existed
-		assetExisted, err := ac.repository.GetById(id_asset)
+		assetExisted, err := ac.repository.GetById(idAsset)
 		if err != nil {
 			log.Println("err get data asset: ", err)
 			return c.JSON(http.StatusInternalServerError, response.InternalServerError("error", "err get data asset"))
@@ -193,7 +193,7 @@ func (ac AssetController) UpdateAssetController() echo.HandlerFunc {
 
 		//bind data photo
 		// Multipart form
-		var url_photo string
+		var urlPhoto string
 		form, err := c.MultipartForm()
 		name := asset.Name
 		if name == "" {
@@ -223,19 +223,19 @@ func (ac AssetController) UpdateAssetController() echo.HandlerFunc {
 					return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to join, photo size too big"))
 				}
 
-				filename := "assets_pic/" + strconv.Itoa(asset.Id_category) + "_" + name + fileExtension
-				url_photo, err = util.UploadToS3(&src, filename)
+				fileName := "assets_pic/" + strconv.Itoa(asset.Id_category) + "_" + name + fileExtension
+				urlPhoto, err = util.UploadToS3(&src, fileName)
 				if err != nil {
 					return err
 				}
 			}
 		}
-		if url_photo != "" {
-			asset.Photo = url_photo
+		if urlPhoto != "" {
+			asset.Photo = urlPhoto
 		}
 
 		// update user based on id to database
-		errUpdate := ac.repository.Update(assetExisted, asset, id_asset)
+		errUpdate := ac.repository.Update(assetExisted, asset, idAsset)
 		if errUpdate != nil {
 			fmt.Println(errUpdate)
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed update data"))
@@ -248,20 +248,20 @@ func (ac AssetController) UpdateAssetController() echo.HandlerFunc {
 // 5. delete asset
 func (ac AssetController) DeleteAssetController() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		idrole, err := middlewares.GetIdRole(c)
+		idRole, err := middlewares.GetIdRole(c)
 
-		if err != nil || idrole != 1 {
+		if err != nil || idRole != 1 {
 			return c.JSON(http.StatusUnauthorized, response.UnauthorizedRequest("unauthorized", "unauthorized access"))
 		}
 
 		// get id from param
-		id_asset, errConv := strconv.Atoi(c.Param("id"))
+		idAsset, errConv := strconv.Atoi(c.Param("id"))
 		if errConv != nil {
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to convert id"))
 		}
 
 		// delete asset based on id from database
-		errDelete := ac.repository.Delete(id_asset)
+		errDelete := ac.repository.Delete(idAsset)
 		if errDelete != nil {
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "data not found"))
 		}
@@ -298,26 +298,26 @@ func (ac AssetController) GetHistoryUsageController() echo.HandlerFunc {
 		}
 
 		// get id from param
-		id_asset, errConv := strconv.Atoi(c.Param("id"))
+		idAsset, errConv := strconv.Atoi(c.Param("id"))
 		if errConv != nil {
 			fmt.Println(errConv)
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to convert id"))
 		}
 
-		limitstr := c.QueryParam("limit")
-		offsetstr := c.QueryParam("offset")
+		limitStr := c.QueryParam("limit")
+		offsetStr := c.QueryParam("offset")
 
-		limit, err := strconv.Atoi(limitstr)
+		limit, err := strconv.Atoi(limitStr)
 		if err != nil {
 			limit = 0
 		}
 
-		offset, err := strconv.Atoi(offsetstr)
+		offset, err := strconv.Atoi(offsetStr)
 		if err != nil {
 			offset = 0
 		}
 
-		history, err := ac.repository.GetHistoryUsage(id_asset, limit, offset)
+		history, err := ac.repository.GetHistoryUsage(idAsset, limit, offset)
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, response.BadRequest("failed", "failed to fetch data"))
 		}
