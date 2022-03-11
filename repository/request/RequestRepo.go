@@ -133,9 +133,9 @@ func (rr *requestRepo) GetAvailQty(id int) (entities.Request, error) {
 }
 
 // get requests (admin)
-func (rr *requestRepo) GetAdmin(return_date, request_date, status, filter_date, category string, limit, offset int) ([]entities.RequestResponse, error) {
+func (rr *requestRepo) GetAdmin(returnDate, requestDate, status, filterDate, category string, limit, offset int) ([]entities.RequestResponse, error) {
 	var condition string
-	var cond_limit string
+	var condLimit string
 	var requests []entities.RequestResponse
 
 	var bind []interface{}
@@ -155,8 +155,8 @@ func (rr *requestRepo) GetAdmin(return_date, request_date, status, filter_date, 
 		}
 	}
 
-	if filter_date != "" {
-		bind = append(bind, "%"+filter_date+"%")
+	if filterDate != "" {
+		bind = append(bind, "%"+filterDate+"%")
 		condition += "and r.request_date LIKE ? "
 	}
 
@@ -165,27 +165,27 @@ func (rr *requestRepo) GetAdmin(return_date, request_date, status, filter_date, 
 		condition += "and c.description LIKE ? "
 	}
 
-	if request_date == "latest" {
+	if requestDate == "latest" {
 		condition += "order by r.request_date desc "
-	} else if request_date == "oldest" {
+	} else if requestDate == "oldest" {
 		condition += "order by r.request_date asc "
 	}
 
-	if return_date == "longest" {
+	if returnDate == "longest" {
 		condition += "order by r.return_date desc "
-	} else if return_date == "shortest" {
+	} else if returnDate == "shortest" {
 		condition += "order by r.return_date asc "
 	}
 
 	if limit != 0 && offset == 0 {
 		bind = append(bind, limit)
-		cond_limit += "limit ?"
+		condLimit += "limit ?"
 	}
 
 	if limit != 0 && offset != 0 {
 		bind = append(bind, offset)
 		bind = append(bind, limit)
-		cond_limit += "limit ?, ?"
+		condLimit += "limit ?, ?"
 	}
 
 	res, err := rr.db.Query(`select r.id, r.id_user, r.id_asset, r.id_status, r.request_date, r.return_date, r.description, u.name as user_name, a.name as asset_name, c.description as category, a.avail_quantity, s.description as status 
@@ -194,7 +194,7 @@ func (rr *requestRepo) GetAdmin(return_date, request_date, status, filter_date, 
 	join status_check s on s.id = r.id_status
 	join assets a on a.id = r.id_asset
 		join categories c on c.id = a.id_category
-	where id_status != 0	`+condition+cond_limit, bind...)
+	where id_status != 0	`+condition+condLimit, bind...)
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -216,10 +216,10 @@ func (rr *requestRepo) GetAdmin(return_date, request_date, status, filter_date, 
 }
 
 // get requests (manager)
-func (rr *requestRepo) GetManager(return_date, request_date, status, filter_date, category string, limit, offset int) ([]entities.RequestResponse, error) {
+func (rr *requestRepo) GetManager(returnDate, requestDate, status, filterDate, category string, limit, offset int) ([]entities.RequestResponse, error) {
 	var condition string
 	var requests []entities.RequestResponse
-	var cond_limit string
+	var condLimit string
 
 	var bind []interface{}
 
@@ -238,8 +238,8 @@ func (rr *requestRepo) GetManager(return_date, request_date, status, filter_date
 		}
 	}
 
-	if filter_date != "" {
-		bind = append(bind, "%"+filter_date+"%")
+	if filterDate != "" {
+		bind = append(bind, "%"+filterDate+"%")
 		condition += "and r.request_date LIKE ? "
 	}
 
@@ -248,27 +248,27 @@ func (rr *requestRepo) GetManager(return_date, request_date, status, filter_date
 		condition += "and c.description LIKE ? "
 	}
 
-	if request_date == "latest" {
+	if requestDate == "latest" {
 		condition += "order by r.request_date desc "
-	} else if request_date == "oldest" {
+	} else if requestDate == "oldest" {
 		condition += "order by r.request_date asc "
 	}
 
-	if return_date == "longest" {
+	if returnDate == "longest" {
 		condition += "order by r.return_date desc "
-	} else if return_date == "shortest" {
+	} else if returnDate == "shortest" {
 		condition += "order by r.return_date asc "
 	}
 
 	if limit != 0 && offset == 0 {
 		bind = append(bind, limit)
-		cond_limit += "limit ?"
+		condLimit += "limit ?"
 	}
 
 	if limit != 0 && offset != 0 {
 		bind = append(bind, offset)
 		bind = append(bind, limit)
-		cond_limit += "limit ?, ?"
+		condLimit += "limit ?, ?"
 	}
 
 	res, err := rr.db.Query(`select r.id, r.id_user, r.id_asset, r.id_status, r.request_date, r.return_date, r.description, u.name as user_name, a.name as asset_name, c.description as category, a.avail_quantity, s.description as status 
@@ -277,7 +277,7 @@ func (rr *requestRepo) GetManager(return_date, request_date, status, filter_date
 	join status_check s on s.id = r.id_status
 	join assets a on a.id = r.id_asset
 		join categories c on c.id = a.id_category
-	where id_status != 0 and id_status != 1 and id_status != 5 and id_status != 7	`+condition+cond_limit, bind...)
+	where id_status != 0 and id_status != 1 and id_status != 5 and id_status != 7	`+condition+condLimit, bind...)
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -298,14 +298,14 @@ func (rr *requestRepo) GetManager(return_date, request_date, status, filter_date
 	return requests, nil
 }
 
-func (rr *requestRepo) GetEmployee(id_employee int, is_history bool, limit, offset int) ([]entities.RequestResponse, error) {
+func (rr *requestRepo) GetEmployee(idEmployee int, isHistory bool, limit, offset int) ([]entities.RequestResponse, error) {
 	var condition string
-	var cond_limit string
+	var condLimit string
 	var requests []entities.RequestResponse
 
 	var bind []interface{}
-	bind = append(bind, id_employee)
-	if is_history == true {
+	bind = append(bind, idEmployee)
+	if isHistory == true {
 		condition += "and r.id_status in (6,7,8) "
 	}
 
@@ -313,13 +313,13 @@ func (rr *requestRepo) GetEmployee(id_employee int, is_history bool, limit, offs
 
 	if limit != 0 && offset == 0 {
 		bind = append(bind, limit)
-		cond_limit += "limit ?"
+		condLimit += "limit ?"
 	}
 
 	if limit != 0 && offset != 0 {
 		bind = append(bind, offset)
 		bind = append(bind, limit)
-		cond_limit += "limit ?, ?"
+		condLimit += "limit ?, ?"
 	}
 
 	res, err := rr.db.Query(`select r.id, r.id_user, r.id_asset, r.id_status, a.id_category, r.request_date, r.return_date, r.description, u.name as user_name, a.name as asset_name, c.description as category, a.avail_quantity, s.description as status , a.photo
@@ -328,7 +328,7 @@ func (rr *requestRepo) GetEmployee(id_employee int, is_history bool, limit, offs
 	join status_check s on s.id = r.id_status
 	join assets a on a.id = r.id_asset
 		join categories c on c.id = a.id_category
-	where r.id_user = ? `+condition+cond_limit, bind...)
+	where r.id_user = ? `+condition+condLimit, bind...)
 	if err != nil {
 		log.Println(err)
 		return nil, err
